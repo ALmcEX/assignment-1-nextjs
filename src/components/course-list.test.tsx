@@ -33,14 +33,15 @@ describe("CourseList", () => {
 
 describe("CourseCatalog", () => {
   it("shows that successful rows come from Supabase", () => {
-    render(<CourseCatalog courses={[]} />);
+    render(<CourseCatalog courses={[]} user={null} />);
 
     expect(screen.getByRole("heading", { name: "Course Catalog" })).toBeTruthy();
     expect(screen.getByText("Live data from Supabase")).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Continue with Google" })).toBeTruthy();
   });
 
   it("renders a visible safe error state", () => {
-    render(<CourseCatalog courses={[]} hasError />);
+    render(<CourseCatalog courses={[]} hasError user={null} />);
 
     expect(screen.getByRole("alert").textContent).toBe("Unable to load courses right now.");
   });

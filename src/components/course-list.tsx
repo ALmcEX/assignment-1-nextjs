@@ -1,4 +1,6 @@
 import type { Course } from "@/src/lib/courses";
+import type { User } from "@supabase/supabase-js";
+import { AuthNav } from "./auth-nav";
 
 export function CourseList({ courses }: { courses: Course[] }) {
   if (courses.length === 0) {
@@ -21,12 +23,15 @@ export function CourseList({ courses }: { courses: Course[] }) {
 export function CourseCatalog({
   courses,
   hasError = false,
+  user,
 }: {
   courses: Course[];
   hasError?: boolean;
+  user: User | null;
 }) {
   return (
     <main className="catalog-shell">
+      <AuthNav user={user} />
       <header className="catalog-header">
         <p className="eyebrow">Design for AI · Assignment 2</p>
         <h1>Course Catalog</h1>
