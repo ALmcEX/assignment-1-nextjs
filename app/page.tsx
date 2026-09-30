@@ -4,7 +4,11 @@ import { getCourses } from "@/src/lib/courses";
 import type { Course } from "@/src/lib/courses";
 import { createServerSupabaseClient } from "@/src/lib/supabase/server";
 
-export default async function Home() {
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: Promise<{ auth?: string }>;
+}) {
   await connection();
 
   let courses: Course[] = [];
@@ -20,5 +24,14 @@ export default async function Home() {
     hasError = true;
   }
 
-  return <CourseCatalog courses={courses} hasError={hasError} user={user} />;
+  const { auth } = await searchParams;
+
+  return (
+    <CourseCatalog
+      courses={courses}
+      hasError={hasError}
+      user={user}
+      authRequired={auth === "required"}
+    />
+  );
 }

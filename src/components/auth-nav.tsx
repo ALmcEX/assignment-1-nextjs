@@ -1,11 +1,13 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { User } from "@supabase/supabase-js";
 import { createBrowserSupabaseClient } from "@/src/lib/supabase/browser";
 
 export function AuthNav({ user }: { user: User | null }) {
+  const router = useRouter();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isBusy, setIsBusy] = useState(false);
 
@@ -37,7 +39,8 @@ export function AuthNav({ user }: { user: User | null }) {
       return;
     }
 
-    window.location.assign("/");
+    router.replace("/");
+    router.refresh();
   }
 
   return (

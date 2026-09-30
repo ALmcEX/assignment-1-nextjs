@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { isProfileComplete, type Profile } from "@/src/lib/profile";
 import { saveProfile } from "@/src/lib/profile-client";
@@ -14,6 +15,7 @@ export type ProfileFormProps = {
 
 export function ProfileForm({ profile, avatarUrl, saved }: ProfileFormProps) {
   const isComplete = isProfileComplete(profile);
+  const router = useRouter();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -27,7 +29,8 @@ export function ProfileForm({ profile, avatarUrl, saved }: ProfileFormProps) {
         formData: new FormData(event.currentTarget),
         currentAvatarPath: profile.avatarPath,
       });
-      window.location.assign("/profile?saved=1");
+      router.replace("/profile?saved=1");
+      router.refresh();
     } catch (error) {
       setErrorMessage(
         error instanceof Error

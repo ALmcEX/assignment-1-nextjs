@@ -24,16 +24,23 @@ export function CourseCatalog({
   courses,
   hasError = false,
   user,
+  authRequired = false,
 }: {
   courses: Course[];
   hasError?: boolean;
   user: User | null;
+  authRequired?: boolean;
 }) {
   return (
     <main className="catalog-shell">
       <AuthNav user={user} />
+      {authRequired && !user ? (
+        <p className="state-panel auth-required" role="alert">
+          Please sign in with Google to view that page.
+        </p>
+      ) : null}
       <header className="catalog-header">
-        <p className="eyebrow">Design for AI · Assignment 2</p>
+        <p className="eyebrow">Design for AI · Assignment 3</p>
         <h1>Course Catalog</h1>
         <p className="intro">
           A small collection of courses rendered from a secure, read-only Supabase table.

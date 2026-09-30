@@ -45,30 +45,32 @@ export default async function ProfilePage({
     profileRow = insertedProfile;
   }
 
+  let profile;
   try {
-    const profile = parseProfile(profileRow);
-    const avatarUrl = profile.avatarPath
-      ? supabase.storage.from("avatars").getPublicUrl(profile.avatarPath).data.publicUrl
-      : null;
-    const { saved } = await searchParams;
-
-    return (
-      <main className="centered-shell">
-        <section className="profile-panel">
-          <p className="eyebrow">Your account</p>
-          <h1>Profile</h1>
-          <p className="intro">
-            Add your name and an optional photo. Your image is stored in Supabase
-            Storage, not in the profiles table.
-          </p>
-          <ProfileForm profile={profile} avatarUrl={avatarUrl} saved={saved === "1"} />
-          <Link href="/">Back to courses</Link>
-        </section>
-      </main>
-    );
+    profile = parseProfile(profileRow);
   } catch {
     return <ProfileLoadError />;
   }
+
+  const avatarUrl = profile.avatarPath
+    ? supabase.storage.from("avatars").getPublicUrl(profile.avatarPath).data.publicUrl
+    : null;
+  const { saved } = await searchParams;
+
+  return (
+    <main className="centered-shell">
+      <section className="profile-panel">
+        <p className="eyebrow">Your account</p>
+        <h1>Profile</h1>
+        <p className="intro">
+          Add your name and an optional photo. Your image is stored in Supabase
+          Storage, not in the profiles table.
+        </p>
+        <ProfileForm profile={profile} avatarUrl={avatarUrl} saved={saved === "1"} />
+        <Link href="/">Back to courses</Link>
+      </section>
+    </main>
+  );
 }
 
 function ProfileLoadError() {
