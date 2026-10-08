@@ -1,37 +1,9 @@
-import { connection } from "next/server";
-import { CourseCatalog } from "@/src/components/course-list";
-import { getCourses } from "@/src/lib/courses";
-import type { Course } from "@/src/lib/courses";
-import { createServerSupabaseClient } from "@/src/lib/supabase/server";
-
-export default async function Home({
-  searchParams,
-}: {
-  searchParams: Promise<{ auth?: string }>;
-}) {
-  await connection();
-
-  let courses: Course[] = [];
-  let hasError = false;
-  const supabase = await createServerSupabaseClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  try {
-    courses = await getCourses();
-  } catch {
-    hasError = true;
-  }
-
-  const { auth } = await searchParams;
-
-  return (
-    <CourseCatalog
-      courses={courses}
-      hasError={hasError}
-      user={user}
-      authRequired={auth === "required"}
-    />
-  );
+import { RantFeed } from '@/src/components/rants/rant-feed';
+import { getRants } from '@/src/lib/rants/queries';
+import type { RantSummary } from '@/src/lib/rants/types';
+import { createServerSupabaseClient } from '@/src/lib/supabase/server';
+export default async function Home({searchParams}:{searchParams:Promise<{sort?:string;auth?:string}>}) {
+ const params=await searchParams;const sort=params.sort==='popular'?'popular':'latest';const client=await createServerSupabaseClient();
+ let rants:RantSummary[]=[];let hasError=false;try{rants=await getRants(client,sort);}catch{hasError=true;}
+ return <RantFeed rants={rants} sort={sort} hasError={hasError} authRequired={params.auth==='required'}/>;
 }

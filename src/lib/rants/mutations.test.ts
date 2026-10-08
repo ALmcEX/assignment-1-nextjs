@@ -1,0 +1,14 @@
+import { expect,it } from 'vitest';
+import type { SupabaseClient } from '@supabase/supabase-js';
+import { publishRant,setVote,addComment } from './mutations';
+const post={title:'Rant',location:'NYC',body:'Slow trains'};
+function fixture(signedIn=true,failInsert=false){
+ const state:{rows:Record<string,unknown>[];uploaded:string[];removed:string[];voteArgs:unknown[]}={rows:[],uploaded:[],removed:[],voteArgs:[]};
+ const client={auth:{getUser:async()=>({data:{user:signedIn?{id:'11111111-1111-4111-8111-111111111111'}:null},error:null})},storage:{from:()=>({upload:async(path:string)=>{state.uploaded.push(path);return {error:null};},remove:async(paths:string[])=>{state.removed.push(...paths);return{error:null};}})},from:()=>({insert:(row:Record<string,unknown>)=>{state.rows.push(row);return {select:()=>({single:async()=>({data:failInsert?null:{id:'22222222-2222-4222-8222-222222222222'},error:failInsert?new Error('db down'):null})}),then:(resolve:(v:unknown)=>void)=>resolve({error:null})};}}),rpc:async(name:string,args:unknown)=>{state.voteArgs.push({name,args});return{error:null};}} as unknown as SupabaseClient;
+ return {client,state};
+}
+it('blocks all mutations for a visitor before writing anything',async()=>{const {client,state}=fixture(false);await expect(publishRant(client,post,null)).rejects.toThrow('signInRequired');await expect(setVote(client,'22222222-2222-4222-8222-222222222222',1)).rejects.toThrow('signInRequired');await expect(addComment(client,'22222222-2222-4222-8222-222222222222','hello')).rejects.toThrow('signInRequired');expect(state.rows).toEqual([]);});
+it('assigns post ownership from the verified session',async()=>{const {client,state}=fixture();expect(await publishRant(client,post,null)).toEqual({id:'22222222-2222-4222-8222-222222222222'});expect(state.rows[0]).toMatchObject({user_id:'11111111-1111-4111-8111-111111111111',title:'Rant'});});
+it('removes a newly uploaded photo when post insertion fails',async()=>{const {client,state}=fixture(true,true);await expect(publishRant(client,post,new File(['image'],'photo.png',{type:'image/png'}))).rejects.toThrow('mutationFailed');expect(state.uploaded[0]).toMatch(/^11111111-1111-4111-8111-111111111111\//);expect(state.removed).toEqual(state.uploaded);});
+it('uses the atomic authenticated vote operation and validates its target',async()=>{const {client,state}=fixture();await setVote(client,'22222222-2222-4222-8222-222222222222',-1);expect(state.voteArgs).toEqual([{name:'toggle_rant_vote',args:{p_rant_id:'22222222-2222-4222-8222-222222222222',p_value:-1}}]);await expect(setVote(client,'invalid',1)).rejects.toThrow();});
+it('rejects empty comments before inserting',async()=>{const {client,state}=fixture();await expect(addComment(client,'22222222-2222-4222-8222-222222222222',' ')).rejects.toThrow('invalidText');expect(state.rows).toEqual([]);});
