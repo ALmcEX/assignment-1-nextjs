@@ -6,7 +6,7 @@ CITY / VENT extends Assignment 3 with a Columbia / NYC rant board, title-and-loc
 
 ## Confirmed
 
-- Vitest: 83 passing tests across 17 files, including auth checks, vote mutations, failure preservation, pending request handling, pagination, language persistence and photo controls.
+- Vitest: 85 passing tests across 18 files, including auth checks, vote mutations, failure preservation, pending request handling, pagination, language persistence and photo controls.
 - ESLint and production build: exit 0 with Next.js 16.4.0.
 - Production dependency audit: zero vulnerabilities. Development dependency advisories remain; no forced framework downgrade.
 - Live Supabase SQL permission suite: PASS, with all fixtures rolled back. Anonymous writes, identity spoofing, invalid votes, foreign generation / photo association and quota misuse are denied. The suite is sequential, not a multi-connection load test.
@@ -14,11 +14,16 @@ CITY / VENT extends Assignment 3 with a Columbia / NYC rant board, title-and-loc
 - All four Assignment 4 migrations were applied to the existing project, including pagination and explicit anonymous vote-function revocation.
 - Browser: public deployed homepage loads, six titles and locations display, Chinese interface switch works, and detail pages show the example body / AI label / comments with a guest sign-in prompt.
 - Browser: guest publication redirects to a sign-in prompt; existing Google account signs in on localhost and can access the Chinese publication form. Profile and publication photo controls use site-language labels.
+- Browser: latest preview Google login originally fell back to the old Site URL; adding its exact callback fixed it. Authenticated upvote, switch to downvote and repeat-to-remove were verified; final vote counts were restored to zero.
 - Vercel: Require Log In is unchecked, so deployment protection is already disabled. Git integration produced a Ready preview deployment.
 
 ## Remaining verification and configuration
 
-`GEMINI_API_KEY` and `SUPABASE_SERVICE_ROLE_KEY` were absent from both local and Vercel configuration at the time of verification. The live AI provider flow is therefore not yet verified. Configure both as server environment variables, redeploy, then verify a generated draft and its saved original prompt / output. Never put these keys in client code or Git.
+`GEMINI_API_KEY` and `SUPABASE_SERVICE_ROLE_KEY` are now configured as Secret variables in Vercel Production and Preview, with explicit user authorization. Local development still has only the public Supabase variables. No credentials are stored in source control.
+
+Live provider verification is blocked by Google capacity errors: direct authenticated requests to Gemini 3.8 Flash and 3.5 Flash-Lite returned HTTP 503 / UNAVAILABLE; the recommended Interactions API also returned 503 / service_unavailable. No successful generated result or published Gemini post is claimed. A separate HTTP 400 revealed that the REST structured-output MIME field requires `APPLICATION_JSON`; that contract is fixed and covered by a regression test. Server diagnostics record only the failure stage and HTTP status, never prompts or API response bodies.
+
+During UI configuration, two tool outputs inadvertently displayed credentials. The user was notified and advised to rotate them themselves. The final deployment must be updated if the user rotates either key. No automatic credential rotation or paid billing was performed.
 
 Manual end-to-end photo publishing and comment posting have not been performed against the live site. Their client mutations and database permission paths are covered by unit and rollback SQL tests. The browser viewport override did not change the connected tab's effective width; mobile menu behavior has a regression test, but an actual narrow-screen check remains.
 
