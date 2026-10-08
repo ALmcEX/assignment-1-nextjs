@@ -13,8 +13,8 @@ function profile(overrides: Partial<Profile> = {}): Profile {
 }
 
 describe("getPostAuthPath", () => {
-  it("routes complete profiles to the protected dashboard", () => {
-    expect(getPostAuthPath(profile())).toBe("/dashboard");
+  it("returns complete profiles to the rant homepage", () => {
+    expect(getPostAuthPath(profile())).toBe("/");
   });
 
   it.each([
@@ -22,7 +22,7 @@ describe("getPostAuthPath", () => {
     { lastName: null },
     { firstName: "" },
     { lastName: "   " },
-  ])("routes incomplete profiles to Profile", (overrides) => {
-    expect(getPostAuthPath(profile(overrides))).toBe("/profile");
+  ])("returns incomplete profiles to the rant homepage", (overrides) => {
+    expect(getPostAuthPath(profile(overrides))).toBe("/");
   });
 });
