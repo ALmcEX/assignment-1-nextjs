@@ -2,7 +2,7 @@
 
 ## Implemented
 
-CITY / VENT extends Assignment 3 with a Columbia / NYC rant board, title-and-location-only feed, full detail pages, optional photos, authenticated publishing / voting / comments, Gemini drafts with stored original prompts and outputs, and English / Simplified Chinese settings. Six AI-authored example posts are seeded without fabricated authors or votes.
+CITY / VENT extends Assignment 3 with a Columbia / NYC rant board, title-and-location-only feed, full detail pages, optional photos, authenticated publishing / voting / comments, AI cat image generation with stored original prompts and outputs (off pending owner billing activation), and English / Simplified Chinese settings. Six AI-authored example posts are seeded without fabricated authors or votes.
 
 ## Confirmed
 
@@ -28,3 +28,10 @@ During UI configuration, two tool outputs inadvertently displayed credentials. T
 Manual end-to-end photo publishing and comment posting have not been performed against the live site. Their client mutations and database permission paths are covered by unit and rollback SQL tests. The browser viewport override did not change the connected tab's effective width; mobile menu behavior has a regression test, but an actual narrow-screen check remains.
 
 PM feedback has not been received. Collect it at the feedback session and record actual changes afterward. The submission form itself has not been submitted.
+
+
+## Cat image revision
+
+The owner approved cat image code/UI first, with real generation deferred until they enable billing. Text drafting was replaced by six cat breeds and three art styles; authored text is preserved. Cat/paw/yarn vectors decorate the interface. `GEMINI_IMAGE_ENABLED` defaults to false, including a disabled button and localized explanation. Private image storage and ownership-derived publication use migration `20261008000004`; live application and rollback SQL validation remain pending while Chrome access is unavailable. The older detail schema is supported during this rollout. See `docs/ai-cat-images.md` for activation steps and verification boundaries.
+
+Local revision verification: 93 tests across 19 files passed; ESLint and production build exited 0. Independent image-flow review found no material correctness/security issue. Paid provider calls were not made.
