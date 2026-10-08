@@ -10,11 +10,14 @@ export async function createDraft(userId:string|null,input:DraftInput,deps:Gener
  const clean={prompt:textField(input.prompt,3000),location:textField(input.location,120),language:input.language};
  if(!['en','zh-CN'].includes(clean.language))throw new RantError('invalidText');
  const token=await deps.reserve(userId);
+ let stage='generate';
  try {
-  const draft=await deps.generate(clean);const valid=validateRant({title:draft.title,body:draft.body,location:clean.location});
-  const generationId=await deps.save({...clean,...draft,title:valid.title,body:valid.body,userId,token});
+  const draft=await deps.generate(clean);stage='validate';const valid=validateRant({title:draft.title,body:draft.body,location:clean.location});
+  stage='save';const generationId=await deps.save({...clean,...draft,title:valid.title,body:valid.body,userId,token});
   return {generationId,title:valid.title,body:valid.body};
- } catch {
+ } catch (cause) {
+  const status=cause instanceof Error&&/^Gemini HTTP [0-9]{3}$/.test(cause.message)?cause.message:undefined;
+  console.error('AI draft failure',{stage,status});
   await deps.release(userId,token).catch(()=>{});
   throw new RantError('aiFailed');
  }
