@@ -11,7 +11,7 @@ export async function POST(request:Request){
  if(!process.env.GEMINI_API_KEY||!process.env.SUPABASE_SERVICE_ROLE_KEY)return Response.json({error:'aiUnavailable'},{status:503});
  try {
   if(Number(request.headers.get('content-length')??0)>16000)throw new RantError('invalidText');
-  const text=await request.text();if(text.length>16000)throw new RantError('invalidText');const input=JSON.parse(text) as DraftInput;
+  const text=await request.text();if(text.length>16000)throw new RantError('invalidText');const input=JSON.parse(text) as DraftInput;if(!input||typeof input!=='object')throw new RantError('invalidText');
   const admin=createAdminSupabaseClient();
   const result=await createDraft(user.id,input,{configured:true,generate:generateDraft,
    reserve:async id=>{const {data,error}=await admin.rpc('reserve_ai_generation',{p_user_id:id});if(error)throw new RantError(error.message.includes('quotaExceeded')?'quotaExceeded':error.message.includes('generationBusy')?'generationBusy':'aiFailed');return data as string;},

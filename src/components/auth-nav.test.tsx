@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import type { User } from "@supabase/supabase-js";
 import { AuthNav } from "./auth-nav";
 
@@ -47,3 +47,5 @@ describe("AuthNav", () => {
     expect(screen.getByRole("button", { name: "Sign out" })).toBeTruthy();
   });
 });
+
+it("exposes account navigation through a mobile menu",()=>{render(<AuthNav user={signedInUser}/>);const toggle=screen.getByRole("button",{name:"Your account"});expect(toggle.getAttribute("aria-expanded")).toBe("false");fireEvent.click(toggle);expect(toggle.getAttribute("aria-expanded")).toBe("true");expect(screen.getByRole("link",{name:"Profile"}).getAttribute("href")).toBe("/profile");});

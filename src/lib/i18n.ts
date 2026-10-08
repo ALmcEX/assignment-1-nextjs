@@ -1,5 +1,6 @@
 export type Language = 'en' | 'zh-CN';
 const messages = {
+ nextPage:['Next page','下一页'], previousPage:['Previous page','上一页'], page:['Page','页'], olderComments:['Older comments','更早的评论'], newerComments:['Newer comments','较新的评论'], retry:['Try again','重试'],
  brand:['CITY / VENT','城市 / 吐槽'], home:['Rants','吐槽'], courses:['Course catalog','课程目录'], profile:['Profile','个人资料'], dashboard:['Dashboard','账户面板'],
  publish:['Publish rant','发布吐槽'], newRant:['Write a rant','写条吐槽'], latest:['Latest','最新'], popular:['Popular','热门'],
  eyebrow:['COLUMBIA & NEW YORK','哥大 · 纽约'], feedTitle:['Big city. Small grievances.','大城市，小牢骚。'], feedIntro:['Dorm life, delayed trains, and everything in between. Let it out.','从宿舍到地铁，把那些生活里的小崩溃写下来。'],
