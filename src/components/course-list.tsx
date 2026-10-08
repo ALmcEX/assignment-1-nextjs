@@ -1,10 +1,12 @@
+"use client";
 import type { Course } from "@/src/lib/courses";
 import type { User } from "@supabase/supabase-js";
-import { AuthNav } from "./auth-nav";
+import { useLanguage } from "./language-provider";
 
 export function CourseList({ courses }: { courses: Course[] }) {
+  const {t}=useLanguage();
   if (courses.length === 0) {
-    return <p className="state-panel">No courses are available yet.</p>;
+    return <p className="state-panel">{t("noCourses")}</p>;
   }
 
   return (
@@ -31,29 +33,30 @@ export function CourseCatalog({
   user: User | null;
   authRequired?: boolean;
 }) {
+  const {t}=useLanguage();
   return (
     <main className="catalog-shell">
-      <AuthNav user={user} />
+
       {authRequired && !user ? (
         <p className="state-panel auth-required" role="alert">
-          Please sign in with Google to view that page.
+          {t("authRequired")}
         </p>
       ) : null}
       <header className="catalog-header">
-        <p className="eyebrow">Design for AI · Assignment 3</p>
-        <h1>Course Catalog</h1>
+        <p className="eyebrow">{t("catalogEyebrow")}</p>
+        <h1>{t("catalogTitle")}</h1>
         <p className="intro">
-          A small collection of courses rendered from a secure, read-only Supabase table.
+          {t("catalogIntro")}
         </p>
         <p className="data-status">
           <span aria-hidden="true" />
-          Live data from Supabase
+          {t("liveData")}
         </p>
       </header>
 
       {hasError ? (
         <p className="state-panel error-panel" role="alert">
-          Unable to load courses right now.
+          {t("coursesError")}
         </p>
       ) : (
         <CourseList courses={courses} />

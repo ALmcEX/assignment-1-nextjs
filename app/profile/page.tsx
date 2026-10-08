@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Text } from "@/src/components/language-provider";
 import { redirect } from "next/navigation";
 import { parseProfile } from "@/src/lib/profile";
 import { createServerSupabaseClient } from "@/src/lib/supabase/server";
@@ -53,21 +54,20 @@ export default async function ProfilePage({
   }
 
   const avatarUrl = profile.avatarPath
-    ? supabase.storage.from("avatars").getPublicUrl(profile.avatarPath).data.publicUrl
+    ? (await supabase.storage.from("avatars").createSignedUrl(profile.avatarPath, 600)).data?.signedUrl ?? null
     : null;
   const { saved } = await searchParams;
 
   return (
     <main className="centered-shell">
       <section className="profile-panel">
-        <p className="eyebrow">Your account</p>
-        <h1>Profile</h1>
+        <p className="eyebrow"><Text id="yourAccount"/></p>
+        <h1><Text id="profile"/></h1>
         <p className="intro">
-          Add your name and an optional photo. Your image is stored in Supabase
-          Storage, not in the profiles table.
+          <Text id="profileIntro"/>
         </p>
         <ProfileForm profile={profile} avatarUrl={avatarUrl} saved={saved === "1"} />
-        <Link href="/">Back to courses</Link>
+        <Link href="/"><Text id="back"/></Link>
       </section>
     </main>
   );
@@ -77,9 +77,9 @@ function ProfileLoadError() {
   return (
     <main className="centered-shell">
       <section className="state-panel error-panel" role="alert">
-        <h1>Profile unavailable</h1>
-        <p>We could not load your profile right now. Please try again.</p>
-        <Link href="/">Return home</Link>
+        <h1><Text id="profileUnavailable"/></h1>
+        <p><Text id="loadError"/></p>
+        <Link href="/"><Text id="returnHome"/></Link>
       </section>
     </main>
   );

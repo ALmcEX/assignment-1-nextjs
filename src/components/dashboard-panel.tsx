@@ -1,4 +1,6 @@
+"use client";
 import Link from "next/link";
+import { useLanguage } from "./language-provider";
 import { isProfileComplete, type Profile } from "@/src/lib/profile";
 
 export function DashboardPanel({
@@ -8,12 +10,13 @@ export function DashboardPanel({
   email: string;
   profile: Profile;
 }) {
+  const {t}=useLanguage();
   const isComplete = isProfileComplete(profile);
 
   return (
     <section className="dashboard-panel">
-      <p className="eyebrow">Protected route</p>
-      <h1>Members-only dashboard</h1>
+      <p className="eyebrow">{t("protectedRoute")}</p>
+      <h1>{t("memberDashboard")}</h1>
 
       {isComplete ? (
         <div className="account-summary">
@@ -21,17 +24,17 @@ export function DashboardPanel({
             {profile.firstName} {profile.lastName}
           </h2>
           <p>{email}</p>
-          <p>You can see this page because your Supabase session is active.</p>
+          <p>{t("sessionActive")}</p>
         </div>
       ) : (
         <p className="completion-prompt">
-          Complete your profile to unlock your dashboard.
+          {t("unlockDashboard")}
         </p>
       )}
 
       <div className="link-row">
-        <Link href="/profile">Edit profile</Link>
-        <Link href="/">Course catalog</Link>
+        <Link href="/profile">{t("editProfile")}</Link>
+        <Link href="/courses">{t("courses")}</Link>
       </div>
     </section>
   );

@@ -26,7 +26,7 @@ describe("DashboardPanel", () => {
       "/profile",
     );
     expect(screen.getByRole("link", { name: "Course catalog" }).getAttribute("href")).toBe(
-      "/",
+      "/courses",
     );
   });
 

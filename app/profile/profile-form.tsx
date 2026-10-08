@@ -1,6 +1,9 @@
 "use client";
 
 import Image from "next/image";
+import { useLanguage } from "@/src/components/language-provider";
+import { PhotoPicker } from "@/src/components/photo-picker";
+import { errorKey } from "@/src/lib/i18n";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { isProfileComplete, type Profile } from "@/src/lib/profile";
@@ -14,6 +17,7 @@ export type ProfileFormProps = {
 };
 
 export function ProfileForm({ profile, avatarUrl, saved }: ProfileFormProps) {
+  const {t}=useLanguage();
   const isComplete = isProfileComplete(profile);
   const router = useRouter();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -32,11 +36,7 @@ export function ProfileForm({ profile, avatarUrl, saved }: ProfileFormProps) {
       router.replace("/profile?saved=1");
       router.refresh();
     } catch (error) {
-      setErrorMessage(
-        error instanceof Error
-          ? error.message
-          : "Unable to save your profile. Please try again.",
-      );
+      setErrorMessage(errorKey(error));
       setIsSaving(false);
     }
   }
@@ -44,16 +44,16 @@ export function ProfileForm({ profile, avatarUrl, saved }: ProfileFormProps) {
   return (
     <form className="profile-form" onSubmit={handleSubmit}>
       {!isComplete ? (
-        <p className="completion-prompt">Complete your profile to continue.</p>
+        <p className="completion-prompt">{t("completeProfile")}</p>
       ) : null}
-      {saved ? <p role="status">Profile saved.</p> : null}
-      {errorMessage ? <p role="alert">{errorMessage}</p> : null}
+      {saved ? <p role="status">{t("profileSaved")}</p> : null}
+      {errorMessage ? <p role="alert">{t(errorMessage)}</p> : null}
 
       {avatarUrl ? (
         <Image
           className="profile-avatar"
           src={avatarUrl}
-          alt="Current profile photo"
+          alt={t("currentPhoto")}
           width={112}
           height={112}
           unoptimized
@@ -61,26 +61,19 @@ export function ProfileForm({ profile, avatarUrl, saved }: ProfileFormProps) {
       ) : null}
 
       <label>
-        First name
+        {t("firstName")}
         <input name="firstName" defaultValue={profile.firstName ?? ""} required />
       </label>
 
       <label>
-        Last name
+        {t("lastName")}
         <input name="lastName" defaultValue={profile.lastName ?? ""} required />
       </label>
 
-      <label>
-        Profile photo
-        <input
-          name="avatar"
-          type="file"
-          accept="image/jpeg,image/png,image/webp,image/gif"
-        />
-      </label>
+      <PhotoPicker name="avatar" label="profilePhoto" accept="image/jpeg,image/png,image/webp,image/gif" />
 
       <button type="submit" disabled={isSaving}>
-        {isSaving ? "Saving…" : "Save profile"}
+        {t(isSaving ? "saving" : "saveProfile")}
       </button>
     </form>
   );

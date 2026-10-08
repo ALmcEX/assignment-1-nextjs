@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { cleanup, render, screen } from "@testing-library/react";
+import { SiteHeader } from "./site-header";
 import { CourseCatalog, CourseList } from "./course-list";
 
 vi.mock("next/navigation", () => ({
@@ -37,7 +38,7 @@ describe("CourseList", () => {
 
 describe("CourseCatalog", () => {
   it("shows that successful rows come from Supabase", () => {
-    render(<CourseCatalog courses={[]} user={null} />);
+    render(<><SiteHeader user={null}/><CourseCatalog courses={[]} user={null} /></>);
 
     expect(screen.getByRole("heading", { name: "Course Catalog" })).toBeTruthy();
     expect(screen.getByText("Live data from Supabase")).toBeTruthy();
