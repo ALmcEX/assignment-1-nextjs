@@ -10,3 +10,12 @@ it('rejects unknown cat options before reserving quota',async()=>{const{state,de
 it('rejects disguised or oversized image output and releases quota',async()=>{for(const image of [new Uint8Array([1,2,3]),new Uint8Array(5242881)]){const{state,deps}=fixture();deps.generate=async()=>({image,mimeType:'image/png',model:'test',systemPrompt:'cat'});await expect(createDraft('user',input,deps)).rejects.toThrow('aiFailed');expect(state.released).toBe(true);expect(state.saved).toEqual([]);}});
 it('removes the uploaded draft if persistence fails, and releases quota',async()=>{const{state,deps}=fixture();deps.save=async()=>{throw new Error('db');};await expect(createDraft('user',input,deps)).rejects.toThrow('aiFailed');expect(state.removed).toBe(true);expect(state.released).toBe(true);});
 it('releases quota after an upstream failure and emits no prompt or secret',async()=>{const{state,deps}=fixture();deps.generate=async()=>{throw new Error('Gemini HTTP 503');};const log=vi.spyOn(console,'error').mockImplementation(()=>{});await expect(createDraft('user',input,deps)).rejects.toThrow('aiFailed');expect(state.released).toBe(true);expect(log).toHaveBeenCalledWith('AI image failure',{stage:'generate',status:'Gemini HTTP 503'});log.mockRestore();});
+
+it('allows cat creation without a location',async()=>{
+ const {createDraft}=await import('./generation-service');
+ let location:unknown;
+ const result=await createDraft('owner',{prompt:'A cat in space',language:'en',breed:'orange',style:'clay'}, {
+ configured:true,reserve:async()=> 'token',release:async()=>{},generate:async input=>{location=input.location;return{image:new Uint8Array([137,80,78,71,13,10,26,10,0,0,0,0]),mimeType:'image/png',model:'test',systemPrompt:'test'};},upload:async()=> 'owner/cat.png',remove:async()=>{},preview:async()=> 'https://storage.example/cat.png',save:async()=> 'generation',
+ });
+ expect(result.generationId).toBe('generation');expect(location).toBe('');
+});
