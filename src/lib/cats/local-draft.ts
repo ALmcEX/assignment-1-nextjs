@@ -1,12 +1,13 @@
 import { catBreeds, catStyles } from "../rants/cat-options";
 import type { CatSeed } from "./types";
-export type CatFormDraft = CatSeed & { title: string; location: string };
+export type CatFormDraft = CatSeed & { title: string; caption: string; location: string };
 function clean(value: unknown): CatFormDraft | null {
   if (!value || typeof value !== "object") return null;
   const v = value as CatFormDraft;
   if (
     typeof v.prompt !== "string" ||
     [...v.prompt].length > 1000 ||
+    (v.caption !== undefined && (typeof v.caption !== "string" || [...v.caption].length > 1000)) ||
     typeof v.title !== "string" ||
     [...v.title].length > 120 ||
     typeof v.location !== "string" ||
@@ -18,6 +19,7 @@ function clean(value: unknown): CatFormDraft | null {
     return null;
   return {
     prompt: v.prompt,
+    caption: v.caption ?? "",
     title: v.title,
     location: v.location,
     breed: v.breed,

@@ -56,3 +56,5 @@ input:focus,textarea:focus,select:focus{outline-color:var(--accent)}input::place
 @media(max-width:640px){.meme-hero-note{display:none}.meme-card-top{padding:20px}.meme-attribution{flex-direction:column;gap:4px}.meme-image img{max-height:380px}}
 
 .media-tabs { display:flex; gap:1rem; flex-wrap:wrap; margin-bottom:1.5rem; }
+
+.image-prompt-block,.image-caption-block{border:1px solid var(--line);border-radius:6px;padding:20px;margin-bottom:20px}.image-prompt-block h2,.image-caption-block h2{font-size:15px;margin:0 0 20px;color:var(--ink)}.image-caption-block .field>small{display:block;font-size:10px;line-height:1.6;margin-top:10px;color:var(--muted)}

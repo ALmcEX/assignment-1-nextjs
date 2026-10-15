@@ -8,7 +8,7 @@ export function optionalCatText(value: unknown, max = 120): string {
 }
 export async function publishCat(
   client: SupabaseClient,
-  input: { generationId: string; title?: string; location?: string },
+  input: { generationId: string; title?: string; location?: string; caption?: string },
 ): Promise<{ id: string }> {
   const {
     data: { user },
@@ -16,9 +16,10 @@ export async function publishCat(
   } = await client.auth.getUser();
   if (authError || !user) throw new RantError("signInRequired");
   if (!isUuid(input.generationId)) throw new RantError("invalidText");
-  const { data, error } = await client.rpc("publish_cat_image", {
+  const { data, error } = await client.rpc("publish_cat_image_with_caption", {
     p_generation_id: input.generationId,
     p_title: optionalCatText(input.title),
+    p_caption: optionalCatText(input.caption, 1000),
     p_location: optionalCatText(input.location),
   });
   if (error || !data)

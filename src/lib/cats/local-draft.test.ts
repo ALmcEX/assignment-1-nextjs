@@ -10,6 +10,7 @@ afterEach(() => {
 });
 const draft = {
   prompt: "A cat in space",
+  caption: "Moon shift",
   title: "",
   location: "",
   breed: "orange" as const,
@@ -52,4 +53,10 @@ it("survives blocked storage without blocking editing", () => {
     throw new Error("blocked");
   });
   expect(readLocalDraft("a")).toBeNull();
+});
+
+
+it("restores older drafts with an empty public caption", () => {
+  window.localStorage.setItem("catcanvas:draft:v1:a", JSON.stringify({ ...draft, caption: undefined }));
+  expect(readLocalDraft("a")).toEqual({ ...draft, caption: "" });
 });

@@ -23,7 +23,7 @@ afterEach(() => {
 });
 it("allows saving an idea while generation and publication are unavailable", () => {
   render(<CatComposer userId="owner" />);
-  fireEvent.change(screen.getByLabelText(/Your idea/), {
+  fireEvent.change(screen.getByLabelText(/Generation prompt/), {
     target: { value: "A sleepy cat" },
   });
   expect(
@@ -52,7 +52,7 @@ it("generates without a location and prevents publishing an image after its idea
     }),
   }));
   render(<CatComposer userId="owner" imageEnabled />);
-  fireEvent.change(screen.getByLabelText(/Your idea/), {
+  fireEvent.change(screen.getByLabelText(/Generation prompt/), {
     target: { value: "A cat in space" },
   });
   fireEvent.click(screen.getByRole("button", { name: "Generate cat image" }));
@@ -62,7 +62,7 @@ it("generates without a location and prevents publishing an image after its idea
       .getByRole("button", { name: /Publish creation/ })
       .matches(":disabled"),
   ).toBe(false);
-  fireEvent.change(screen.getByLabelText(/Your idea/), {
+  fireEvent.change(screen.getByLabelText(/Generation prompt/), {
     target: { value: "A different scene" },
   });
   expect(
@@ -87,7 +87,7 @@ it("retains the last successful image after a replacement fails", async () => {
       : { ok: false, json: async () => ({ error: "aiFailed" }) },
   );
   render(<CatComposer userId="owner" imageEnabled />);
-  fireEvent.change(screen.getByLabelText(/Your idea/), {
+  fireEvent.change(screen.getByLabelText(/Generation prompt/), {
     target: { value: "A cat" },
   });
   fireEvent.click(screen.getByRole("button", { name: "Generate cat image" }));
@@ -100,7 +100,7 @@ it("retains the last successful image after a replacement fails", async () => {
 });
 it("validates Unicode length without counting emoji twice", async () => {
   render(<CatComposer userId="owner" imageEnabled />);
-  fireEvent.change(screen.getByLabelText(/Your idea/), {
+  fireEvent.change(screen.getByLabelText(/Generation prompt/), {
     target: { value: "🐈".repeat(1000) },
   });
   expect(
@@ -108,7 +108,7 @@ it("validates Unicode length without counting emoji twice", async () => {
       .getByRole("button", { name: "Generate cat image" })
       .matches(":disabled"),
   ).toBe(false);
-  fireEvent.change(screen.getByLabelText(/Your idea/), {
+  fireEvent.change(screen.getByLabelText(/Generation prompt/), {
     target: { value: "🐈".repeat(1001) },
   });
   await waitFor(() =>
@@ -118,4 +118,24 @@ it("validates Unicode length without counting emoji twice", async () => {
         .matches(":disabled"),
     ).toBe(true),
   );
+});
+
+
+it("keeps caption edits separate from generation and publishes only the caption", async () => {
+  const request = vi.fn(async (_url: string, _init: RequestInit) => { void _url; void _init; return { ok: true, json: async () => ({
+    generationId: "33333333-3333-4333-8333-333333333333",
+    imageUrl: "https://storage.example/cat.png",
+  }) }; });
+  vi.stubGlobal("fetch", request);
+  vi.mocked(publishCat).mockResolvedValue({ id: "post" });
+  render(<CatComposer userId="owner" imageEnabled />);
+  fireEvent.change(screen.getByLabelText(/Generation prompt/), { target: { value: "Private lunar scene" } });
+  fireEvent.change(screen.getByLabelText(/Public caption/), { target: { value: "Moon shift" } });
+  fireEvent.click(screen.getByRole("button", { name: "Generate cat image" }));
+  await screen.findByRole("img", { name: "Your AI-generated cat" });
+  expect(JSON.parse(request.mock.calls[0][1].body as string)).not.toHaveProperty("caption");
+  fireEvent.change(screen.getByLabelText(/Public caption/), { target: { value: "Late shift" } });
+  fireEvent.click(screen.getByRole("button", { name: /Publish creation/ }));
+  await waitFor(() => expect(publishCat).toHaveBeenCalledWith({}, expect.objectContaining({ caption: "Late shift" })));
+  expect(request).toHaveBeenCalledTimes(1);
 });

@@ -28,7 +28,7 @@ do $$ declare denied boolean:=false; row record; begin
  begin perform public.publish_cat_image('44444444-4444-4444-8444-444444444444','',''); exception when others then denied:=true; end;
  if not denied then raise exception 'text generation became cat image'; end if;
  select * into row from public.cat_feed_page('latest','all',0,true);
- if row.title<>'A cat in space' or row.location<>'' or row.body<>'A cat in space' or row."canReuse"<>true then raise exception 'publication metadata incorrect'; end if;
+ if row.title<>'AI cat image' or row.location<>'' or row.body<>'' or row."canReuse"<>true then raise exception 'publication metadata incorrect'; end if;
  perform public.toggle_rant_vote(row.id,1::smallint);
  select * into row from public.cat_feed_page('popular','all',0,true);
  if row.totals->>'score'<>'1' or row."myVote"<>1 then raise exception 'vote aggregate incorrect'; end if;

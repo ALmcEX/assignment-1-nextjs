@@ -39,6 +39,7 @@ export function CatComposer({
   const router = useRouter();
   const [form, setForm] = useState<CatFormDraft>({
     prompt: "",
+    caption: "",
     title: "",
     location: "",
     breed: "orange",
@@ -68,11 +69,12 @@ export function CatComposer({
       active = false;
     };
   }, [userId, seed]);
-  const valid =
+  const generationValid =
     !!form.prompt.trim() &&
     [...form.prompt.trim()].length <= 1000 &&
     [...form.title.trim()].length <= 120 &&
     [...form.location.trim()].length <= 120;
+  const valid = generationValid && [...form.caption.trim()].length <= 1000;
   const stale = !!preview && preview.fingerprint !== fingerprint(form);
   function update<K extends keyof CatFormDraft>(
     key: K,
@@ -83,7 +85,7 @@ export function CatComposer({
     setStatus(null);
   }
   async function generate() {
-    if (pending.current || !imageEnabled || !valid) return;
+    if (pending.current || !imageEnabled || !generationValid) return;
     pending.current = true;
     setBusy("generate");
     setError(null);
@@ -132,6 +134,7 @@ export function CatComposer({
       const result = await publishCat(createBrowserSupabaseClient(), {
         generationId: preview.generationId,
         title: form.title,
+        caption: form.caption,
         location: form.location,
       });
       clearLocalDraft(userId);
@@ -158,9 +161,11 @@ export function CatComposer({
       <div className="studio-grid">
         <section className="studio-form">
           <fieldset disabled={!!busy}>
+            <section className="image-prompt-block" aria-labelledby="image-prompt-heading">
+            <h2 id="image-prompt-heading">{t("imagePromptSection")}</h2>
             <div className="field scene-field">
               <label htmlFor="cat-scene">
-                {t("scene")} <small>{[...form.prompt].length}/1000</small>
+                {t("imagePrompt")} <small>{[...form.prompt].length}/1000</small>
               </label>
               <textarea
                 id="cat-scene"
@@ -169,7 +174,7 @@ export function CatComposer({
                 placeholder={t("scenePlaceholder")}
                 onChange={(e) => update("prompt", e.target.value)}
               />
-              <small>{t("publicSceneHint")}</small>
+              <small>{t("privateImagePromptHint")}</small>
             </div>
             <div className="cat-options">
               <label htmlFor="cat-type">
@@ -218,6 +223,14 @@ export function CatComposer({
                 <option value="zh-CN">简体中文</option>
               </select>
             </div>
+            </section>
+            <section className="image-caption-block" aria-labelledby="image-caption-heading">
+              <h2 id="image-caption-heading">{t("imageCaptionSection")}</h2>
+              <div className="field">
+                <label htmlFor="cat-caption">{t("imagePublicCaption")} <small>{[...form.caption].length}/1000</small></label>
+                <textarea id="cat-caption" rows={3} value={form.caption} placeholder={t("imageCaptionPlaceholder")} onChange={(e) => update("caption", e.target.value)} />
+                <small>{t("imageCaptionHint")}</small>
+              </div>
             <details className="optional-fields">
               <summary>
                 {t("optionalTitle")} / {t("optionalLocation")}
@@ -239,10 +252,11 @@ export function CatComposer({
                 />
               </div>
             </details>
+            </section>
             <button
               className="generate-button"
               type="button"
-              disabled={!imageEnabled || !!busy || !valid}
+              disabled={!imageEnabled || !!busy || !generationValid}
               onClick={generate}
             >
               <span aria-hidden="true">&#10022;</span>{" "}
@@ -323,6 +337,7 @@ export function CatComposer({
               </div>
             )}
           </div>
+          {preview && form.caption.trim() ? <p className="cat-caption">{form.caption.trim()}</p> : null}
           {preview ? (
             <div className="preview-actions">
               <button
