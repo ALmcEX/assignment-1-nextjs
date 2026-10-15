@@ -16,7 +16,7 @@ import { isUuid } from "@/src/lib/rants/validation";
 import { createBrowserSupabaseClient } from "@/src/lib/supabase/browser";
 import { errorKey } from "@/src/lib/i18n";
 import { useLanguage } from "../language-provider";
-import { CatIllustration } from "../cat-illustration";
+
 import { breedKey, styleKey } from "./cat-card";
 const fingerprint = (f: CatFormDraft) =>
   JSON.stringify([
@@ -146,9 +146,10 @@ export function CatComposer({
   }
   return (
     <main className="studio-shell">
-      <Link className="back-link" href="/">
+      <Link className="back-link" href="/images">
         ← {t("backGallery")}
       </Link>
+      <nav className="sort-tabs media-tabs" aria-label={t("creationMode")}><Link href="/create">{t("aiCaption")}</Link><Link href="/create/image" aria-current="page">{t("imageGallery")}</Link></nav>
       <header className="studio-header">
         <p className="eyebrow">CATCANVAS / STUDIO</p>
         <h1>{t("studioTitle")}</h1>
@@ -256,7 +257,7 @@ export function CatComposer({
             {!imageEnabled ? (
               <p className="generation-note">{t("generationOff")}</p>
             ) : (
-              <p className="generation-note">{t("aiHint")}</p>
+              <p className="generation-note">{t("imageBudgetHint")}</p>
             )}
             <div className="draft-actions">
               <button
@@ -316,7 +317,7 @@ export function CatComposer({
               />
             ) : (
               <div className="preview-placeholder">
-                <CatIllustration />
+                <span className="empty-spark" aria-hidden="true">✦</span>
                 <h2>{t("previewEmpty")}</h2>
                 <p>{t("previewHint")}</p>
               </div>

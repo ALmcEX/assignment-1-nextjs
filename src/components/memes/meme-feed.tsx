@@ -5,6 +5,8 @@ import type { MemeFeedItem } from "@/src/lib/memes/types";
 import type { CatFilters } from "@/src/lib/cats/types";
 import { catFeedHref } from "@/src/lib/cats/filters";
 import { useLanguage } from "../language-provider";
+import { CatCard } from "../cats/cat-card";
+import type { CatFeedItem } from "@/src/lib/cats/types";
 import { MemeCard } from "./meme-card";
 export function MemeFeed({
   items,
@@ -13,6 +15,7 @@ export function MemeFeed({
   hasMore,
   hasError,
   authRequired = false,
+  imageItems,
 }: {
   items: MemeFeedItem[];
   filters: CatFilters;
@@ -20,22 +23,28 @@ export function MemeFeed({
   hasMore: boolean;
   hasError: boolean;
   authRequired?: boolean;
+  imageItems?: CatFeedItem[];
 }) {
   const { t } = useLanguage();
+  const images = imageItems !== undefined;
+  const createHref = images ? "/create/image" : "/create";
+  const createLabel = images ? "generate" : "createCat";
+  const href = (patch = {}) => catFeedHref(filters,patch,images ? "/images" : "/");
   return (
     <main className="gallery-shell">
+      <nav className="sort-tabs media-tabs" aria-label={t("creationMode")}><Link href="/" aria-current={!images ? "page" : undefined}>{t("aiCaption")}</Link><Link href="/images" aria-current={images ? "page" : undefined}>{t("imageGallery")}</Link></nav>
       <section className="gallery-hero meme-hero">
         <div>
-          <p className="eyebrow">{t("memeEyebrow")}</p>
-          <h1>{t("memeGalleryTitle")}</h1>
-          <p className="gallery-intro">{t("memeGalleryIntro")}</p>
-          <Link className="primary-link" href="/create">
-            {t("createCat")} ↗
+          <p className="eyebrow">{t(images ? "galleryEyebrow" : "memeEyebrow")}</p>
+          <h1>{t(images ? "galleryTitle" : "memeGalleryTitle")}</h1>
+          <p className="gallery-intro">{t(images ? "galleryIntro" : "memeGalleryIntro")}</p>
+          <Link className="primary-link" href={createHref}>
+            {t(createLabel)} ↗
           </Link>
         </div>
         <div className="meme-hero-note" aria-hidden="true">
-          <span>01 / {t("memeTemplate")}</span>
-          <span>02 / {t("aiCaption")}</span>
+          <span>01 / {t(images ? "scene" : "memeTemplate")}</span>
+          <span>02 / {t(images ? "aiCatGenerated" : "aiCaption")}</span>
           <span>03 / {t("communityVotes")}</span>
         </div>
       </section>
@@ -50,7 +59,7 @@ export function MemeFeed({
             <Link
               key={sort}
               aria-current={filters.sort === sort ? "page" : undefined}
-              href={catFeedHref(filters, { sort, page: 1 })}
+              href={href({ sort, page: 1 })}
             >
               {t(sort)}
             </Link>
@@ -61,7 +70,7 @@ export function MemeFeed({
             <Link
               key={window}
               aria-current={filters.window === window ? "page" : undefined}
-              href={catFeedHref(filters, { window, page: 1 })}
+              href={href({ window, page: 1 })}
             >
               {t(window)}
             </Link>
@@ -72,11 +81,11 @@ export function MemeFeed({
       {hasError ? (
         <div className="gallery-state" role="alert">
           <p>{t("loadError")}</p>
-          <Link href={catFeedHref(filters)}>{t("retry")} ↻</Link>
+          <Link href={href()}>{t("retry")} ↻</Link>
         </div>
-      ) : items.length ? (
+      ) : (images ? imageItems.length : items.length) ? (
         <div className="cat-grid">
-          {items.map((item) => (
+          {images ? imageItems.map(item => <CatCard key={item.id} item={item} user={user} />) : items.map((item) => (
             <MemeCard key={item.id} item={item} user={user} />
           ))}
         </div>
@@ -85,16 +94,16 @@ export function MemeFeed({
           <span className="empty-spark" aria-hidden="true">
             ✦
           </span>
-          <h2>{t("memeEmpty")}</h2>
+          <h2>{t(images ? "galleryEmpty" : "memeEmpty")}</h2>
           <p>{t("galleryEmptyHint")}</p>
-          <Link className="primary-link" href="/create">
-            {t("createCat")} ↗
+          <Link className="primary-link" href={createHref}>
+            {t(createLabel)} ↗
           </Link>
         </div>
       )}
       <nav className="pagination" aria-label={t("page")}>
         {filters.page > 1 ? (
-          <Link href={catFeedHref(filters, { page: filters.page - 1 })}>
+          <Link href={href({ page: filters.page - 1 })}>
             ← {t("previousPage")}
           </Link>
         ) : (
@@ -104,7 +113,7 @@ export function MemeFeed({
           {t("page")} {filters.page}
         </span>
         {hasMore ? (
-          <Link href={catFeedHref(filters, { page: filters.page + 1 })}>
+          <Link href={href({ page: filters.page + 1 })}>
             {t("nextPage")} →
           </Link>
         ) : (

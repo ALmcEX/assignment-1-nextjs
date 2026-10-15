@@ -94,3 +94,9 @@ it("offers recovery before an image URL can be signed without losing the story",
     screen.getByRole("link", { name: "Try again" }).getAttribute("href"),
   ).toContain("/rants/");
 });
+
+it('routes image reuse and back navigation to image mode',()=>{
+ render(<RantDetail rant={{...rant,ai_image_path:'owner/cat.png'}} user={null} canReuse />);
+ expect(screen.getByRole('link',{name:/Use this idea again/}).getAttribute('href')).toBe('/create/image?reuse='+rant.id);
+ expect(screen.getByRole('link',{name:/Back to gallery/}).getAttribute('href')).toBe('/images');
+});

@@ -77,7 +77,7 @@ export function CatCard({
             myVote={item.myVote}
           />
           {item.canReuse ? (
-            <Link className="reuse-small" href={`/create?reuse=${item.id}`}>
+            <Link className="reuse-small" href={`/create/image?reuse=${item.id}`}>
               {t("reusePrompt")} ↗
             </Link>
           ) : (

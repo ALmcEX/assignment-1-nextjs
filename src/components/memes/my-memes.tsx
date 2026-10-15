@@ -20,6 +20,7 @@ export function MyMemes({
   const { t } = useLanguage();
   return (
     <main className="gallery-shell personal-gallery">
+      <nav className="sort-tabs media-tabs" aria-label={t("creationMode")}><Link href="/my-cats" aria-current="page">{t("aiCaption")}</Link><Link href="/my-images">{t("imageGallery")}</Link></nav>
       <header className="personal-header">
         <div>
           <p className="eyebrow">CATCANVAS / COLLECTION</p>

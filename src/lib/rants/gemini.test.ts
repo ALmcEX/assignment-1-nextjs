@@ -5,11 +5,11 @@ const input={prompt:'A cat waiting for a slow washing machine',location:'Dorm',l
 const png='iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+a3ioAAAAASUVORK5CYII=';
 afterEach(()=>{vi.unstubAllGlobals();vi.unstubAllEnvs();});
 test('provider failure exposes only its HTTP status',async()=>{
- vi.stubEnv('GEMINI_API_KEY','test-secret');vi.stubGlobal('fetch',vi.fn().mockResolvedValue(new Response(JSON.stringify({error:{message:'private'}}),{status:429})));
+ vi.stubEnv('GEMINI_IMAGE_API_KEY','test-secret');vi.stubGlobal('fetch',vi.fn().mockResolvedValue(new Response(JSON.stringify({error:{message:'private'}}),{status:429})));
  await expect(generateDraft(input)).rejects.toThrow('Gemini HTTP 429');
 });
 test('returns image bytes, requests an image model and constrains the subject to a cat',async()=>{
- vi.stubEnv('GEMINI_API_KEY','test-secret');
+ vi.stubEnv('GEMINI_IMAGE_API_KEY','test-secret');
  const fetchMock=vi.fn().mockResolvedValue(new Response(JSON.stringify({candidates:[{finishReason:'STOP',content:{parts:[{thought:true,inlineData:{mimeType:'image/png',data:'not-output'}},{inlineData:{mimeType:'image/png',data:png}}]}}]})));vi.stubGlobal('fetch',fetchMock);
  const result=await generateDraft(input);
  expect(result.image).toEqual(new Uint8Array(Buffer.from(png,'base64')));expect(result.mimeType).toBe('image/png');
@@ -17,6 +17,18 @@ test('returns image bytes, requests an image model and constrains the subject to
  const body=JSON.parse(fetchMock.mock.calls[0][1].body);expect(body.generationConfig.responseModalities).toContain('IMAGE');expect(body.systemInstruction.parts[0].text).toContain('cat');expect(result.systemPrompt).toContain('orange');expect(result.systemPrompt).toContain('clay');
 });
 test('refuses text-only output instead of pretending an image was generated',async()=>{
- vi.stubEnv('GEMINI_API_KEY','test-secret');vi.stubGlobal('fetch',vi.fn().mockResolvedValue(new Response(JSON.stringify({candidates:[{finishReason:'STOP',content:{parts:[{text:'I cannot create this image.'}]}}]}))));
+ vi.stubEnv('GEMINI_IMAGE_API_KEY','test-secret');vi.stubGlobal('fetch',vi.fn().mockResolvedValue(new Response(JSON.stringify({candidates:[{finishReason:'STOP',content:{parts:[{text:'I cannot create this image.'}]}}]}))));
  await expect(generateDraft(input)).rejects.toThrow('aiFailed');
+});
+
+test('pins the approved image model and caps output even with a model override',async()=>{
+ vi.stubEnv('GEMINI_IMAGE_API_KEY','test-secret');vi.stubEnv('GEMINI_IMAGE_MODEL','expensive-unapproved');
+ const f=vi.fn().mockResolvedValue(new Response(JSON.stringify({candidates:[{finishReason:'STOP',content:{parts:[{inlineData:{mimeType:'image/png',data:png}}]}}]})));vi.stubGlobal('fetch',f);
+ await generateDraft(input);expect(f.mock.calls[0][0]).toContain('gemini-3.1-flash-lite-image:');
+ const c=JSON.parse(f.mock.calls[0][1].body).generationConfig;expect(c.candidateCount).toBe(1);expect(c.maxOutputTokens).toBe(4096);expect(c.responseFormat.image.imageSize).toBe('1K');
+});
+
+test('does not use the free caption key for paid image calls',async()=>{
+ vi.stubEnv('GEMINI_API_KEY','caption-key');vi.stubEnv('GEMINI_IMAGE_API_KEY','');const f=vi.fn();vi.stubGlobal('fetch',f);
+ await expect(generateDraft(input)).rejects.toThrow('aiUnavailable');expect(f).not.toHaveBeenCalled();
 });

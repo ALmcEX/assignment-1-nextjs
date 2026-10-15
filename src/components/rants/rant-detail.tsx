@@ -26,7 +26,7 @@ export function RantDetail({
   const [failedImage, setFailedImage] = useState<string | null>(null);
   return (
     <main className="detail-shell">
-      <Link className="back-link" href="/">
+      <Link className="back-link" href={rant.ai_image_path ? "/images" : "/"}>
         ← {t("backGallery")}
       </Link>
       <article className="rant-article">
@@ -112,7 +112,7 @@ export function RantDetail({
         {canReuse ? (
           <Link
             className="primary-link reuse-link"
-            href={`/create?reuse=${rant.id}`}
+            href={`${rant.ai_image_path ? "/create/image" : "/create"}?reuse=${rant.id}`}
           >
             {t("reusePrompt")} ↗
           </Link>

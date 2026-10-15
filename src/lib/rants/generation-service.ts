@@ -7,6 +7,7 @@ export type GeneratedDraft = { image: Uint8Array; mimeType: string; model: strin
 export type SavedGeneration = DraftInput & { userId: string; token: string; imagePath: string; mimeType: string; model: string; systemPrompt: string };
 export type GenerationDependencies = {
  configured: boolean;
+ reserveAttempt: () => Promise<void>;
  reserve: (id: string) => Promise<string>;
  release: (id: string, token: string) => Promise<void>;
  generate: (input: DraftInput) => Promise<GeneratedDraft>;
@@ -28,9 +29,11 @@ export async function createDraft(userId: string | null, input: DraftInput, deps
  const clean = { prompt: textField(input.prompt,1000), location: optionalCatText(input.location), language: input.language, breed: input.breed, style: input.style };
  if (!['en','zh-CN'].includes(clean.language) || !catBreeds.includes(clean.breed) || !catStyles.includes(clean.style)) throw new RantError('invalidText');
  const token = await deps.reserve(userId);
- let stage = 'generate';
+ let stage = 'budget';
  let uploaded: string | null = null;
  try {
+  await deps.reserveAttempt();
+  stage = 'generate';
   const draft = await deps.generate(clean);
   stage = 'validate'; validateGeneratedImage(draft.image,draft.mimeType);
   stage = 'upload'; uploaded = await deps.upload(userId,draft.image,draft.mimeType);
@@ -43,6 +46,7 @@ export async function createDraft(userId: string | null, input: DraftInput, deps
   console.error('AI image failure',{stage,status});
   if (uploaded) await deps.remove(uploaded).catch(() => {});
   await deps.release(userId,token).catch(() => {});
+  if (cause instanceof RantError) throw cause;
   throw new RantError('aiFailed');
  }
 }

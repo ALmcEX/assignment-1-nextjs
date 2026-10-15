@@ -1,3 +1,5 @@
+> AI image test extension (2026-10-15): `/create/image`, `/images`, `/my-images`. Independent paid key and lifetime10-request cap; activation pending owner setup. See [image test configuration](docs/ai-image-test-2026-10-15.md).
+
 # CatCanvas
 
 A bilingual cat meme creation and voting app. Choose an existing meme, describe a moment, generate an AI caption, preview and publish it. Personal galleries, owned scene reuse and recent popular lists support returning with new ideas.

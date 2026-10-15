@@ -153,6 +153,7 @@ export function MemeComposer({
       <Link className="back-link" href="/">
         ← {t("backGallery")}
       </Link>
+      <nav className="sort-tabs media-tabs" aria-label={t("creationMode")}><Link href="/create" aria-current="page">{t("aiCaption")}</Link><Link href="/create/image">{t("imageGallery")}</Link></nav>
       <header className="studio-header">
         <p className="eyebrow">CATCANVAS / MEME STUDIO</p>
         <h1>{t("memeStudioTitle")}</h1>

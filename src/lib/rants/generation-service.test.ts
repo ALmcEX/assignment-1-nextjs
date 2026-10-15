@@ -2,7 +2,7 @@ import {expect,it,vi} from 'vitest';
 import {createDraft,type GenerationDependencies,type DraftInput} from './generation-service';
 const input={prompt:'The cat waits at the washing machine',location:'Dorm laundry',language:'en' as const,breed:'tabby' as const,style:'illustration' as const};
 const image=new Uint8Array(Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+a3ioAAAAASUVORK5CYII=','base64'));
-function fixture(){const state={reserved:false,released:false,removed:false,saved:[] as unknown[]};const deps:GenerationDependencies={configured:true,reserve:async()=>{state.reserved=true;return 'token';},release:async()=>{state.released=true;},generate:async()=>({image,mimeType:'image/png',model:'test-image',systemPrompt:'cat system'}),upload:async()=> 'user/image.png',remove:async()=>{state.removed=true;},preview:async()=> 'https://storage.example/signed/image.png',save:async data=>{state.saved.push(data);return '44444444-4444-4444-8444-444444444444';}};return{state,deps};}
+function fixture(){const state={reserved:false,released:false,removed:false,saved:[] as unknown[]};const deps:GenerationDependencies={configured:true,reserveAttempt:async()=>{},reserve:async()=>{state.reserved=true;return 'token';},release:async()=>{state.released=true;},generate:async()=>({image,mimeType:'image/png',model:'test-image',systemPrompt:'cat system'}),upload:async()=> 'user/image.png',remove:async()=>{state.removed=true;},preview:async()=> 'https://storage.example/signed/image.png',save:async data=>{state.saved.push(data);return '44444444-4444-4444-8444-444444444444';}};return{state,deps};}
 it('denies visitors without reserving quota',async()=>{const {state,deps}=fixture();await expect(createDraft(null,input,deps)).rejects.toThrow('signInRequired');expect(state.reserved).toBe(false);});
 it('reports disabled image generation before any external work',async()=>{const {state,deps}=fixture();deps.configured=false;await expect(createDraft('user',input,deps)).rejects.toThrow('aiUnavailable');expect(state.reserved).toBe(false);});
 it('stores private image and original prompt before returning the preview',async()=>{const{state,deps}=fixture();expect(await createDraft('user',input,deps)).toEqual({generationId:'44444444-4444-4444-8444-444444444444',imageUrl:'https://storage.example/signed/image.png'});expect(state.saved).toEqual([{...input,userId:'user',token:'token',imagePath:'user/image.png',mimeType:'image/png',model:'test-image',systemPrompt:'cat system'}]);});
@@ -15,7 +15,14 @@ it('allows cat creation without a location',async()=>{
  const {createDraft}=await import('./generation-service');
  let location:unknown;
  const result=await createDraft('owner',{prompt:'A cat in space',language:'en',breed:'orange',style:'clay'}, {
- configured:true,reserve:async()=> 'token',release:async()=>{},generate:async input=>{location=input.location;return{image:new Uint8Array([137,80,78,71,13,10,26,10,0,0,0,0]),mimeType:'image/png',model:'test',systemPrompt:'test'};},upload:async()=> 'owner/cat.png',remove:async()=>{},preview:async()=> 'https://storage.example/cat.png',save:async()=> 'generation',
+ configured:true,reserveAttempt:async()=>{},reserve:async()=> 'token',release:async()=>{},generate:async input=>{location=input.location;return{image:new Uint8Array([137,80,78,71,13,10,26,10,0,0,0,0]),mimeType:'image/png',model:'test',systemPrompt:'test'};},upload:async()=> 'owner/cat.png',remove:async()=>{},preview:async()=> 'https://storage.example/cat.png',save:async()=> 'generation',
  });
  expect(result.generationId).toBe('generation');expect(location).toBe('');
+});
+
+it('stops before the paid provider when lifetime budget admission fails',async()=>{
+ const {deps,state}=fixture(); const provider=vi.fn(deps.generate);deps.generate=provider;
+ deps.reserveAttempt=async()=>{throw new (await import('./validation')).RantError('quotaExceeded');};
+ await expect(createDraft('user',input,deps)).rejects.toThrow('quotaExceeded');
+ expect(provider).not.toHaveBeenCalled();expect(state.released).toBe(true);
 });

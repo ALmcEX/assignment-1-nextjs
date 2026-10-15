@@ -29,3 +29,10 @@ it("does not hide database errors behind an empty gallery", () => {
   expect(screen.getByRole("alert").textContent).toContain("could not load");
   expect(screen.queryByText("No memes published yet.")).toBeNull();
 });
+
+it('offers image generation and preserves image gallery filters',()=>{
+ render(<MemeFeed {...props} imageItems={[]} />);
+ expect(screen.getByRole('link',{name:'AI cat images'}).getAttribute('href')).toBe('/images');
+ expect(screen.getAllByRole('link',{name:/Generate cat image/})[0].getAttribute('href')).toBe('/create/image');
+ expect(screen.getByRole('link',{name:'Popular'}).getAttribute('href')).toMatch(/^\/images\?/);
+});

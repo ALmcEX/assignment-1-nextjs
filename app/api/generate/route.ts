@@ -9,7 +9,7 @@ export async function POST(request: Request) {
  const client = await createServerSupabaseClient(); const {data:{user},error} = await client.auth.getUser();
  if (error || !user) return Response.json({error:'signInRequired'},{status:401});
  // Enable only after the owner has activated billing and approved a test budget.
- if (process.env.GEMINI_IMAGE_ENABLED !== 'true' || !process.env.GEMINI_API_KEY || !process.env.SUPABASE_SERVICE_ROLE_KEY) return Response.json({error:'aiUnavailable'},{status:503});
+ if (process.env.GEMINI_IMAGE_ENABLED !== 'true' || !process.env.GEMINI_IMAGE_API_KEY || !process.env.SUPABASE_SERVICE_ROLE_KEY) return Response.json({error:'aiUnavailable'},{status:503});
  try {
   if (Number(request.headers.get('content-length') ?? 0) > 16000) throw new RantError('invalidText');
   const text = await request.text(); if (text.length > 16000) throw new RantError('invalidText');
@@ -17,6 +17,7 @@ export async function POST(request: Request) {
   const admin = createAdminSupabaseClient();
   const result = await createDraft(user.id,input,{
    configured:true, generate:generateDraft,
+   reserveAttempt:async()=>{const {error}=await admin.rpc('reserve_image_test_attempt');if(error)throw new RantError(error.message.includes('quotaExceeded')?'quotaExceeded':'aiUnavailable');},
    reserve:async id => { const {data,error} = await admin.rpc('reserve_ai_generation',{p_user_id:id}); if (error) { console.error('AI reservation failure',{code:error.code}); throw new RantError(error.message.includes('quotaExceeded') ? 'quotaExceeded' : error.message.includes('generationBusy') ? 'generationBusy' : 'aiFailed'); } return data as string; },
    release:async (id,token) => { const {error} = await admin.rpc('release_ai_generation',{p_user_id:id,p_token:token}); if (error) throw error; },
    upload:async (id,image,mimeType) => { const ext = {'image/png':'png','image/jpeg':'jpg','image/webp':'webp'}[mimeType]; if (!ext) throw new Error('aiFailed'); const path = `${id}/${crypto.randomUUID()}.${ext}`; const {error} = await admin.storage.from('ai-cat-images').upload(path,image,{contentType:mimeType,upsert:false}); if (error) throw error; return path; },

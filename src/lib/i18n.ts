@@ -1,5 +1,7 @@
 export type Language = 'en' | 'zh-CN';
 const messages = {
+ creationMode:['Creation mode','创作模式'], imageGallery:['AI cat images','AI 猫图'], imageCollection:['My AI cat images','我的 AI 猫图'],
+ imageBudgetHint:['Image generation is in a limited test: 10 requests shared across the app. Failed requests also count.','生图测试阶段：全应用共 10 次请求，失败也计入测试额度。'],
  memeEyebrow:['FAMILIAR CATS. FRESH WORDS.','熟悉的猫咪，全新的表达。'], memeGalleryTitle:['Life happens. Cats get it.','你的生活，猫懂。'], memeGalleryIntro:['Turn everyday moments into cat memes with AI captions. Find a favorite, cast your vote, and bring your next idea.','用 AI 配文，把生活片刻变成猫咪 meme。发现有共鸣的作品，投上一票，再带着新想法回来。'], communityVotes:['Community votes','社区投票'], memeEmpty:['No memes published yet.','还没有发布的 Meme。'], memeFooter:['Same cats. New perspectives.','熟悉的猫咪，不同的视角。'],
 
  memeStudioTitle:['Your day, through a cat’s eyes.','让猫咪，说出你的心情。'], memeStudioIntro:['Choose a familiar meme, describe your moment, and let AI find the words.','选一张熟悉的猫咪 meme，写下生活场景，让 AI 帮你配文。'],

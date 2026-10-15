@@ -43,7 +43,7 @@ export default async function RantPage({
     <RantDetail
       rant={rant}
       user={user}
-      canReuse={!!memeSeed}
+      canReuse={!!memeSeed || !!seed}
       breed={seed?.breed}
       style={seed?.style}
     />
