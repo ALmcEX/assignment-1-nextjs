@@ -122,7 +122,7 @@ export function MemeFeed({
       </nav>
       <footer className="site-footer">
         <span>CATCANVAS / {t("memeFooter")}</span>
-        <Link href="/courses">{t("courses")} ↗</Link>
+
       </footer>
     </main>
   );

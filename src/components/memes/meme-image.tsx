@@ -8,12 +8,10 @@ export function MemeImage({ template }: { template: MemeTemplate }) {
   const [failed, setFailed] = useState(false);
   return (
     <div className="meme-image">
-      {failed ? (
+      {failed || template.imageError ? (
         <div className="image-error" role="status">
           <p>{t("imageMissing")}</p>
-          <button className="secondary-button" onClick={() => setFailed(false)}>
-            {t("retry")}
-          </button>
+          {template.imageError ? <a className="secondary-button" href="">{t("retry")}</a> : <button className="secondary-button" onClick={() => setFailed(false)}>{t("retry")}</button>}
         </div>
       ) : (
         <Image

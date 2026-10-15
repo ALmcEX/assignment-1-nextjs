@@ -54,3 +54,9 @@ it("translates labels without changing generated text", () => {
   expect(screen.getByRole("link", { name: /模板来源/ })).toBeTruthy();
   expect(screen.getByText("<b>Nope.</b>")).toBeTruthy();
 });
+
+it("never repeats the selected caption as a title", () => {
+  render(<MemeCard item={{ ...item, title: item.body }} user={null} />);
+  expect(screen.getAllByText(item.body)).toHaveLength(1);
+  expect(screen.queryByRole("heading")).toBeNull();
+});

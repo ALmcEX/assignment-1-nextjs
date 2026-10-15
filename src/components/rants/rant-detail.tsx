@@ -44,7 +44,7 @@ export function RantDetail({
             )}
           </time>
         </div>
-        <h1>{rant.title}</h1>
+        {!rant.meme_template ? <h1>{rant.title}</h1> : null}
         {rant.generation_id ? (
           <span className="ai-badge">
             ✦{" "}
@@ -97,13 +97,13 @@ export function RantDetail({
               template={rant.meme_template}
             />
             <figcaption>
-              <a
+              {rant.meme_template.id === "uploaded" ? <span>{t("uploadedPhoto")}</span> : <a
                 href={rant.meme_template.sourceUrl}
                 target="_blank"
                 rel="noreferrer"
               >
                 {t("templateSource")} · {rant.meme_template.name} ↗
-              </a>
+              </a>}
             </figcaption>
             <p className="field-hint">{t("memeScene")}</p>
             <p>{rant.meme_scene}</p>

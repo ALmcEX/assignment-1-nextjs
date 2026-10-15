@@ -34,7 +34,7 @@ export function DashboardPanel({
 
       <div className="link-row">
         <Link href="/profile">{t("editProfile")}</Link>
-        <Link href="/courses">{t("courses")}</Link>
+
       </div>
     </section>
   );

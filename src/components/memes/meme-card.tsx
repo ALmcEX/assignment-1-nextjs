@@ -23,13 +23,10 @@ export function MemeCard({
       </div>
       <MemeImage key={item.template.imageUrl} template={item.template} />
       <div className="cat-card-content">
-        <Link href={`/rants/${item.id}`}>
-          <h2>{item.title}</h2>
-        </Link>
         <div className="meme-attribution">
-          <a href={item.template.sourceUrl} target="_blank" rel="noreferrer">
+          {item.template.id === "uploaded" ? <span>{t("uploadedPhoto")}</span> : <a href={item.template.sourceUrl} target="_blank" rel="noreferrer">
             {t("templateSource")} · {item.template.name} ↗
-          </a>
+          </a>}
           <time dateTime={item.created_at}>
             {new Date(item.created_at).toLocaleDateString(
               language === "en" ? "en-US" : "zh-CN",

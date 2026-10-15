@@ -25,9 +25,7 @@ describe("DashboardPanel", () => {
     expect(screen.getByRole("link", { name: "Edit profile" }).getAttribute("href")).toBe(
       "/profile",
     );
-    expect(screen.getByRole("link", { name: "Course catalog" }).getAttribute("href")).toBe(
-      "/courses",
-    );
+    expect(screen.queryByRole("link", { name: "Course catalog" })).toBeNull();
   });
 
   it("asks incomplete users to finish their profile without inventing a name", () => {

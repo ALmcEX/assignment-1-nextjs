@@ -1,6 +1,8 @@
 import type { Language } from "../i18n";
 import type { VoteTotals } from "../rants/types";
 export type MemeTemplate = {
+  storagePath?: string;
+  imageError?: boolean;
   id: string;
   name: string;
   imageUrl: string;
@@ -10,6 +12,8 @@ export type MemeTemplate = {
   height: number;
 };
 export type MemeSeed = {
+  photoGenerationId?: string;
+  photoTemplate?: MemeTemplate;
   prompt: string;
   templateId: string;
   language: Language;
@@ -31,3 +35,5 @@ export type MemeFeedItem = {
   myVote: 1 | -1 | null;
   canReuse: boolean;
 };
+
+export type CaptionChoices = MemeSeed & { generationId: string; captions: string[]; template: MemeTemplate };

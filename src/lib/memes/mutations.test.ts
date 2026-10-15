@@ -14,14 +14,14 @@ it("publishes only the trusted generation ID with optional bounded text", async 
     },
   } as unknown as SupabaseClient;
   expect(
-    await publishMeme(c, { generationId: id, title: " 🐈 ".repeat(1) }),
+    await publishMeme(c, { generationId: id, choiceIndex: 2 }),
   ).toEqual({ id });
   expect(received).toEqual({
-    name: "publish_meme_caption",
-    args: { p_generation_id: id, p_title: "🐈", p_location: "" },
+    name: "publish_caption_choice",
+    args: { p_generation_id: id, p_choice_index: 2, p_location: "" },
   });
   await expect(
-    publishMeme(c, { generationId: id, title: "🐈".repeat(121) }),
+    publishMeme(c, { generationId: id, choiceIndex: 4 }),
   ).rejects.toThrow("invalidText");
   await expect(publishMeme(c, { generationId: "bad" })).rejects.toThrow(
     "invalidText",

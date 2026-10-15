@@ -27,7 +27,7 @@ const candidate = {
   prompt: "deadline",
   language: "en",
   templateId: "188390779",
-  caption: "No more deadlines.",
+  captions: ["No more deadlines.", "Nap first.", "Not today.", "Office hours closed."],
   template: templates[0],
 };
 it("saves idea while unconfigured and prevents publishing", () => {
@@ -66,6 +66,7 @@ it("publishes the original candidate after form edits and retains it when replac
   });
   fireEvent.click(screen.getByRole("button", { name: "Generate caption" }));
   await screen.findByText("No more deadlines.");
+  fireEvent.click(screen.getByRole("button", { name: /No more deadlines/ }));
   fireEvent.change(screen.getByLabelText("Meme template"), {
     target: { value: "405658" },
   });
@@ -85,7 +86,7 @@ it("publishes the original candidate after form edits and retains it when replac
   );
   expect(publishMeme).toHaveBeenCalledWith(
     {},
-    { generationId: candidate.generationId, title: "", location: "" },
+    { generationId: candidate.generationId, choiceIndex: 0, location: "" },
   );
 });
 it("prevents duplicate generation and disables parameter editing in flight", async () => {
@@ -122,4 +123,52 @@ it("previews the template snapshot actually returned and persisted by the server
   expect(
     screen.getByRole("img", { name: "Current server template" }),
   ).toBeTruthy();
+});
+
+
+it("requires a choice and publishes the selected one from four buttons", async () => {
+  vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: true, json: async () => candidate }));
+  vi.mocked(publishMeme).mockResolvedValue({ id: "published-id" });
+  render(<MemeComposer userId="a" templates={templates} textEnabled />);
+  fireEvent.change(screen.getByLabelText(/Your scene/), { target: { value: "deadline" } });
+  fireEvent.click(screen.getByRole("button", { name: "Generate caption" }));
+  await screen.findByText("Nap first.");
+  expect(screen.getByRole("button", { name: "Publish creation" }).matches(":disabled")).toBe(true);
+  for (const caption of candidate.captions) expect(screen.getByRole("button", { name: new RegExp(caption.replace(".", "\\.")) })).toBeTruthy();
+  fireEvent.click(screen.getByRole("button", { name: /Nap first/ }));
+  fireEvent.click(screen.getByRole("button", { name: "Publish creation" }));
+  await waitFor(() => expect(publishMeme).toHaveBeenCalledWith({}, { generationId: candidate.generationId, choiceIndex: 1, location: "" }));
+  expect(screen.queryByLabelText("Title (optional)")).toBeNull();
+});
+it("offers a personal photo and rejects unsupported uploads before generation", () => {
+  render(<MemeComposer userId="a" templates={templates} textEnabled />);
+  fireEvent.click(screen.getByRole("button", { name: "Upload a photo" }));
+  const file = screen.getByLabelText("Choose photo");
+  fireEvent.change(file, { target: { files: [new File(["bad"], "bad.svg", { type: "image/svg+xml" })] } });
+  expect(screen.getByRole("alert")).toBeTruthy();
+  expect(screen.getByRole("button", { name: "Generate caption" }).matches(":disabled")).toBe(true);
+});
+
+it("sends the chosen photo and shows four captions without using the image-generation endpoint", async () => {
+  vi.stubGlobal("URL", class extends URL {
+    static createObjectURL = vi.fn(() => "blob:photo-preview");
+    static revokeObjectURL = vi.fn();
+  });
+  const fetcher = vi.fn().mockResolvedValue({ ok: true, json: async () => ({
+    ...candidate, templateId: "uploaded", template: { ...candidate.template, id: "uploaded", name: "Your photo", imageUrl: "https://storage.example/photo.png", sourceUrl: "", storagePath: "owner/photo.png" },
+  }) });
+  vi.stubGlobal("fetch", fetcher);
+  render(<MemeComposer userId="a" templates={templates} textEnabled />);
+  fireEvent.click(screen.getByRole("button", { name: "Upload a photo" }));
+  const photo = new File(["test"], "cat.png", { type: "image/png" });
+  fireEvent.change(screen.getByLabelText("Choose photo"), { target: { files: [photo] } });
+  fireEvent.change(screen.getByLabelText(/Your scene/), { target: { value: "deadline" } });
+  fireEvent.click(screen.getByRole("button", { name: "Generate caption" }));
+  await screen.findByText("Nap first.");
+  expect(fetcher).toHaveBeenCalledTimes(1);
+  expect(fetcher.mock.calls[0][0]).toBe("/api/captions/generate");
+  const form = fetcher.mock.calls[0][1].body as FormData;
+  expect(form.get("templateId")).toBe("uploaded");
+  expect((form.get("photo") as File).name).toBe("cat.png");
+  expect(screen.getByRole("button", { name: /Nap first/ })).toBeTruthy();
 });

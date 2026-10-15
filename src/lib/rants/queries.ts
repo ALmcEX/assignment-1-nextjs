@@ -1,3 +1,4 @@
+import { resolveMemePhoto } from "../memes/photo-url";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type {
   Rant,
@@ -51,6 +52,7 @@ export async function getRant(
   if (error) throw error;
   if (!data) return null;
   const rant = data as Rant;
+  if (rant.meme_template) rant.meme_template = await resolveMemePhoto(client, rant.meme_template);
   const [commentsResult, totalsResult] = await Promise.all([
     client
       .from("rant_comments")

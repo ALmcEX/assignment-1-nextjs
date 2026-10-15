@@ -1,3 +1,4 @@
+import { resolveMemePhoto } from "./photo-url";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { isUuid } from "../rants/validation";
 import type { CatFilters } from "../cats/types";
@@ -15,7 +16,7 @@ export async function getMemes(
   });
   if (error) throw error;
   const rows = (data ?? []) as MemeFeedItem[];
-  return { items: rows.slice(0, 8), hasMore: rows.length > 8 };
+  return { items: await Promise.all(rows.slice(0, 8).map(async item => ({ ...item, template: await resolveMemePhoto(client, item.template) }))), hasMore: rows.length > 8 };
 }
 export async function getMemeSeed(
   client: SupabaseClient,
@@ -44,7 +45,8 @@ export async function getMemeSeed(
   if (g?.purpose !== "meme_caption") return null;
   return {
     prompt: g.prompt,
-    templateId: g.meme_template.id,
+    templateId: g.meme_template.id === "uploaded" ? "405658" : g.meme_template.id,
+    ...(g.meme_template.id === "uploaded" ? { photoGenerationId: post.generation_id, photoTemplate: await resolveMemePhoto(client, g.meme_template) } : {}),
     language: g.language,
   };
 }
