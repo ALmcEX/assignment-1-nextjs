@@ -52,9 +52,9 @@ do $$ declare boundary timestamptz:=date_trunc('week',now() at time zone 'Americ
 end $$;
 -- Eleven owned works give a nine-row lookahead and a three-row second page.
 insert into public.ai_generations(id,user_id,prompt,system_prompt,title,body,language,provider,media_type,image_path,mime_type,cat_breed,art_style)
-select ('60000000-0000-4000-8000-'||lpad(n::text,12,'0'))::uuid,'11111111-1111-4111-8111-111111111111','Fixture cat '||n,'test','Cat','Cat','en','test','image','11111111-1111-4111-8111-111111111111/test.png','image/png','orange','clay' from generate_series(1,11) n;
+select ('61000000-0000-4000-8000-'||lpad(n::text,12,'0'))::uuid,'11111111-1111-4111-8111-111111111111','Fixture cat '||n,'test','Cat','Cat','en','test','image','11111111-1111-4111-8111-111111111111/test.png','image/png','orange','clay' from generate_series(1,11) n;
 insert into public.rants(user_id,title,body,location,generation_id,ai_image_path,created_at)
-select user_id,title,body,'',id,image_path,now() from public.ai_generations where id::text like '60000000-0000-4000-8000-%';
+select user_id,title,body,'',id,image_path,now() from public.ai_generations where id::text like '61000000-0000-4000-8000-%';
 do $$ begin
  if (select count(*) from public.cat_feed_page('latest','year',0,true))<>9 then raise exception 'first page lookahead incorrect'; end if;
  if (select count(*) from public.cat_feed_page('latest','year',8,true))<>3 then raise exception 'second page incorrect'; end if;

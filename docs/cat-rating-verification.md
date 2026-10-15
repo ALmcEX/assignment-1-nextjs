@@ -17,7 +17,7 @@ The existing target project is `zsuvcnbgsvcxlwiankbf` (`design-for-ai-courses`).
 
 The rollback suites `cat_rating_permissions.sql` and `ai_cat_permissions.sql` passed against the real project. They exercise anonymous write rejection, cross-owner prompt/image privacy, trusted image publication, vote insertion/switch/cancellation, owned previews, public published images, saved provenance and atomic quota. All synthetic users, images, generations and posts roll back; no fake generated work was seeded into the live feed.
 
-A separate temporary PGlite PostgreSQL environment ran the same migrations and permission suites. A pre-existing legitimate-looking published image was added there to reproduce the old tests' empty-gallery assumption. The revised suites pass on populated data. The cat suite also tests the actual RPC's inclusive New York week boundary, older-year exclusion and 9-row lookahead/second-page behavior.
+A separate temporary PGlite PostgreSQL environment ran the same migrations and permission suites. A pre-existing legitimate-looking published image was added there to reproduce the old tests' empty-gallery assumption. The revised suites pass on populated data and with the original text-seed migration present. Pagination fixture IDs use a separate prefix from the original examples. The cat suite also tests the actual RPC's inclusive New York week boundary, older-year exclusion and 9-row lookahead/second-page behavior.
 
 The anonymous Supabase REST/RPC interface returned an empty live cat gallery after migration. Original text posts remain readable and are excluded from this feed.
 
