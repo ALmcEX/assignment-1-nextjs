@@ -1,8 +1,9 @@
+import {getMemeTemplates} from '@/src/lib/memes/templates';
 import { redirect } from "next/navigation";
 import { createServerSupabaseClient } from "@/src/lib/supabase/server";
-import { getCatSeed } from "@/src/lib/cats/queries";
-import { CatComposer } from "@/src/components/cats/cat-composer";
-import type { CatSeed } from "@/src/lib/cats/types";
+import { getMemeSeed } from "@/src/lib/memes/queries";
+import { MemeComposer } from "@/src/components/memes/meme-composer";
+import type { MemeSeed } from "@/src/lib/memes/types";
 export default async function CreateCat({
   searchParams,
 }: {
@@ -14,11 +15,11 @@ export default async function CreateCat({
   } = await client.auth.getUser();
   if (!user) redirect("/?auth=required");
   const { reuse } = await searchParams;
-  let seed: CatSeed | undefined;
+  let seed: MemeSeed | undefined;
   let unavailable = false;
   if (reuse) {
     try {
-      seed = (await getCatSeed(client, reuse)) ?? undefined;
+      seed = (await getMemeSeed(client, reuse)) ?? undefined;
       unavailable = !seed;
     } catch {
       unavailable = true;
@@ -26,12 +27,13 @@ export default async function CreateCat({
   }
   return (
     <>
-      <CatComposer
+      <MemeComposer
         key={`${user.id}:${reuse ?? ""}`}
         userId={user.id}
         seed={seed}
-        imageEnabled={
-          process.env.GEMINI_IMAGE_ENABLED === "true" &&
+        templates={await getMemeTemplates()}
+        textEnabled={
+          process.env.GEMINI_TEXT_ENABLED === "true" &&
           !!process.env.GEMINI_API_KEY &&
           !!process.env.SUPABASE_SERVICE_ROLE_KEY
         }

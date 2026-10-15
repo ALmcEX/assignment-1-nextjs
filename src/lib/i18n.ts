@@ -1,5 +1,8 @@
 export type Language = 'en' | 'zh-CN';
 const messages = {
+ memeStudioTitle:['Your day, through a cat’s eyes.','让猫咪，说出你的心情。'], memeStudioIntro:['Choose a familiar meme, describe your moment, and let AI find the words.','选一张熟悉的猫咪 meme，写下生活场景，让 AI 帮你配文。'],
+ memeTemplate:['Meme template','Meme 模板'], templateSource:['Template source','模板来源'], memeScene:['Your scene','你的场景'], memeScenePlaceholder:['When your group project deadline moves, but nobody tells you…','小组作业截止时间改了，却没人告诉你……'], memePublicHint:['Your scene and caption will be public after publishing. Keep private information out.','发布后，场景和配文会公开展示，请勿填写私人信息。'], captionLanguage:['Caption language','配文语言'], aiCaption:['AI caption','AI 配文'], captionGenerate:['Generate caption','生成配文'], captionGenerating:['Generating caption…','正在生成配文……'], memeQuotaHint:['Up to 10 successful captions per account each day. Regenerating uses another request.','每个账号每天最多成功生成 10 条配文，重新生成会再次消耗请求额度。'], previewScene:['Preview scene','预览对应场景'], previewSnapshot:['Publishing uses this preview’s original scene and template.','发布使用此预览对应的原始场景和模板。'], captionPreviewEmpty:['The picture is familiar. The words are yours.','熟悉的猫咪，你的生活。'], captionPreviewHint:['Generate a caption to see your meme here.','生成配文后，在这里预览你的 meme。'],
+
  score:['Score','得分'], sampleVote:['Voting opens on published creations','已发布作品可参与投票'],
  gallery:['Explore','发现'], createCat:['Create a cat','创作猫图'], myCats:['My creations','我的作品'],
  galleryEyebrow:['A SMALL WORLD. MANY POSSIBLE CATS.','一个小世界，无限种猫咪。'], galleryTitle:['Let your imagination out.','让想象，变成猫。'], galleryIntro:['Turn an idea into a cat. Discover the creations that make you pause, and vote for your favorites.','把一个想法变成猫咪。发现让你停下来的作品，为喜欢的创意投一票。'],
