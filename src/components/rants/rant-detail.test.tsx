@@ -54,8 +54,43 @@ it("keeps the story readable when the image fails and offers a fresh page load",
   expect(screen.getByText(rant.body)).toBeTruthy();
 });
 
-it('shows AI caption with real template and public scene while preserving comments',async()=>{
- const {findMemeTemplate}=await import('@/src/lib/memes/templates');
- render(<RantDetail rant={{...rant,generation_id:rant.id,aiImageUrl:null,body:'Nope.',meme_template:findMemeTemplate('405658'),meme_scene:'Deadline tomorrow'}} user={null}/>);
- expect(screen.getByText(/AI caption/)).toBeTruthy();expect(screen.getByRole('img',{name:'Grumpy Cat'})).toBeTruthy();expect(screen.getByText('Deadline tomorrow')).toBeTruthy();expect(screen.getByText('Nope.')).toBeTruthy();expect(screen.getByText('The conversation')).toBeTruthy();
+it("shows AI caption with real template and public scene while preserving comments", async () => {
+  const { findMemeTemplate } = await import("@/src/lib/memes/templates");
+  render(
+    <RantDetail
+      rant={{
+        ...rant,
+        generation_id: rant.id,
+        aiImageUrl: null,
+        body: "Nope.",
+        meme_template: findMemeTemplate("405658"),
+        meme_scene: "Deadline tomorrow",
+      }}
+      user={null}
+    />,
+  );
+  expect(screen.getByText(/AI caption/)).toBeTruthy();
+  expect(screen.getByRole("img", { name: "Grumpy Cat" })).toBeTruthy();
+  expect(screen.getByText("Deadline tomorrow")).toBeTruthy();
+  expect(screen.getByText("Nope.")).toBeTruthy();
+  expect(screen.getByText("The conversation")).toBeTruthy();
+});
+
+it("offers recovery before an image URL can be signed without losing the story", () => {
+  render(
+    <RantDetail
+      rant={{
+        ...rant,
+        aiImageUrl: null,
+        aiImageError: true,
+        ai_image_path: "author/missing.png",
+      }}
+      user={null}
+    />,
+  );
+  expect(screen.getByRole("alert").textContent).toContain("Image unavailable");
+  expect(screen.getByText(rant.body)).toBeTruthy();
+  expect(
+    screen.getByRole("link", { name: "Try again" }).getAttribute("href"),
+  ).toContain("/rants/");
 });

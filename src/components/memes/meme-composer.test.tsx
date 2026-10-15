@@ -104,3 +104,22 @@ it("prevents duplicate generation and disables parameter editing in flight", asy
       .matches(":disabled"),
   ).toBe(true);
 });
+
+it("previews the template snapshot actually returned and persisted by the server", async () => {
+  vi.stubGlobal("fetch", async () => ({
+    ok: true,
+    json: async () => ({
+      ...candidate,
+      template: { ...candidate.template, name: "Current server template" },
+    }),
+  }));
+  render(<MemeComposer userId="a" templates={templates} textEnabled />);
+  fireEvent.change(screen.getByLabelText(/Your scene/), {
+    target: { value: "deadline" },
+  });
+  fireEvent.click(screen.getByRole("button", { name: "Generate caption" }));
+  await screen.findByText("No more deadlines.");
+  expect(
+    screen.getByRole("img", { name: "Current server template" }),
+  ).toBeTruthy();
+});

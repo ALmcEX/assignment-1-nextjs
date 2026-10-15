@@ -1,5 +1,11 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { cleanup, render, screen } from "@testing-library/react";
+import {
+  cleanup,
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+} from "@testing-library/react";
 import type { Profile } from "@/src/lib/profile";
 import { ProfileForm } from "./profile-form";
 
@@ -7,7 +13,16 @@ vi.mock("next/navigation", () => ({
   useRouter: () => ({ replace: vi.fn(), refresh: vi.fn() }),
 }));
 
-afterEach(cleanup);
+vi.mock("@/src/lib/profile-client", () => ({
+  saveProfile: vi.fn(async () => {}),
+}));
+vi.mock("@/src/lib/supabase/browser", () => ({
+  createBrowserSupabaseClient: () => ({}),
+}));
+afterEach(() => {
+  cleanup();
+  vi.clearAllMocks();
+});
 
 function profile(overrides: Partial<Profile> = {}): Profile {
   return {
@@ -41,11 +56,41 @@ describe("ProfileForm", () => {
       />,
     );
 
-    expect((screen.getByLabelText("First name") as HTMLInputElement).value).toBe("Ada");
+    expect(
+      (screen.getByLabelText("First name") as HTMLInputElement).value,
+    ).toBe("Ada");
     expect((screen.getByLabelText("Last name") as HTMLInputElement).value).toBe(
       "Lovelace",
     );
-    expect(screen.getByRole("img", { name: "Current profile photo" })).toBeTruthy();
+    expect(
+      screen.getByRole("img", { name: "Current profile photo" }),
+    ).toBeTruthy();
     expect(screen.getByRole("status").textContent).toBe("Profile saved.");
   });
+});
+
+it("allows a second profile edit after successful saving", async () => {
+  const { saveProfile } = await import("@/src/lib/profile-client");
+  render(
+    <ProfileForm
+      profile={profile({ firstName: "Ada", lastName: "Lovelace" })}
+      avatarUrl={null}
+      saved={false}
+    />,
+  );
+  fireEvent.submit(
+    screen.getByRole("button", { name: "Save profile" }).closest("form")!,
+  );
+  await waitFor(() =>
+    expect(
+      screen.getByRole("button", { name: "Save profile" }).matches(":disabled"),
+    ).toBe(false),
+  );
+  fireEvent.change(screen.getByLabelText("First name"), {
+    target: { value: "Grace" },
+  });
+  fireEvent.submit(
+    screen.getByRole("button", { name: "Save profile" }).closest("form")!,
+  );
+  await waitFor(() => expect(saveProfile).toHaveBeenCalledTimes(2));
 });

@@ -1,3 +1,9 @@
+# Historical image generation — superseded by meme captions
+
+The current primary flow uses existing cat meme templates and Gemini text captions. See `README.md` and `docs/meme-caption-verification.md`. The original illustration samples have been removed. Image generation remains disabled and no image-model billing has been authorized. The sections below are historical implementation notes, not current activation instructions.
+
+---
+
 # Current CatCanvas flow (2026-10-14)
 
 The user approved replacing the rant-first product with idea -> AI cat image -> community voting. `/create` is the protected studio; location/title are optional. `/` shows only verified published image generations. `/my-cats` supports owned prompt reuse; `/rants/[id]` retains stable detail URLs and historical posts. Browser-only drafts contain editable parameters, scoped by account, never image URLs or generation IDs.

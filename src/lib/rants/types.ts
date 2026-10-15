@@ -22,6 +22,7 @@ export type VoteTotals = { upvotes: number; downvotes: number; score: number };
 export type RantDetail = Rant & {
   imageUrl: string | null;
   aiImageUrl?: string | null;
+  aiImageError?: boolean;
   comments: RantComment[];
   commentsCount: number;
   commentsPage: number;

@@ -17,7 +17,7 @@ export type ProfileFormProps = {
 };
 
 export function ProfileForm({ profile, avatarUrl, saved }: ProfileFormProps) {
-  const {t}=useLanguage();
+  const { t } = useLanguage();
   const isComplete = isProfileComplete(profile);
   const router = useRouter();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -37,6 +37,7 @@ export function ProfileForm({ profile, avatarUrl, saved }: ProfileFormProps) {
       router.refresh();
     } catch (error) {
       setErrorMessage(errorKey(error));
+    } finally {
       setIsSaving(false);
     }
   }
@@ -62,7 +63,11 @@ export function ProfileForm({ profile, avatarUrl, saved }: ProfileFormProps) {
 
       <label>
         {t("firstName")}
-        <input name="firstName" defaultValue={profile.firstName ?? ""} required />
+        <input
+          name="firstName"
+          defaultValue={profile.firstName ?? ""}
+          required
+        />
       </label>
 
       <label>
@@ -70,7 +75,11 @@ export function ProfileForm({ profile, avatarUrl, saved }: ProfileFormProps) {
         <input name="lastName" defaultValue={profile.lastName ?? ""} required />
       </label>
 
-      <PhotoPicker name="avatar" label="profilePhoto" accept="image/jpeg,image/png,image/webp,image/gif" />
+      <PhotoPicker
+        name="avatar"
+        label="profilePhoto"
+        accept="image/jpeg,image/png,image/webp,image/gif"
+      />
 
       <button type="submit" disabled={isSaving}>
         {t(isSaving ? "saving" : "saveProfile")}

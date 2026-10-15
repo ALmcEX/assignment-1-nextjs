@@ -1,25 +1,20 @@
 # CatCanvas
 
-A bilingual cat-image creation and voting app, iterated from the previous CITY / VENT assignment. Users describe an idea, choose a cat and a style, review the generated image, and publish it for community voting. Personal galleries and prompt reuse support returning to earlier ideas.
-
-## Current stage
-
-The redesign is implemented with image generation disabled by default. Original SVG illustrations at `/?samples=1` demonstrate the layout; they are explicitly labeled interface samples and never enter the live ranking or voting tables. Empty and failed live queries have separate states. No provider success, PM feedback, or assignment submission is implied.
+A bilingual cat meme creation and voting app. Choose an existing meme, describe a moment, generate an AI caption, preview and publish it. Personal galleries, owned scene reuse and recent popular lists support returning with new ideas.
 
 ## Routes
 
-- `/`: live image gallery, 8 works per page, latest/popular and New York publication windows.
-- `/?samples=1`: original preview illustrations, no fabricated accounts or votes.
-- `/create`: protected studio with cat/style controls and account-scoped local drafts.
-- `/my-cats`: protected personal gallery and owned prompt reuse.
-- `/rants/[id]`: stable public detail address for new images and historical text posts.
+- `/`: verified published AI-captioned memes; 8 works/page, latest/popular, New York publication windows.
+- `/create`: protected template picker, scene, English/Chinese caption language, account-scoped device draft, preview and publication.
+- `/my-cats`: protected personal meme gallery and owned scene/template reuse.
+- `/rants/[id]`: stable detail URL, meme attribution, voting/comments; historical text and image posts remain readable.
 - `/courses`, `/profile`, `/dashboard`: previous assignments retained.
 
-Visitors can browse. Publishing, voting, commenting and private prompt access require authentication; database RLS and trusted generation references enforce ownership.
+Original illustration samples and `?samples=1` preview behavior were removed. Existing template images are attributed to Imgflip; the AI-generated medium is the caption, not the photograph. No fake community posts or votes are created.
 
 ## Development
 
-Use the existing `.env.local` containing public Supabase configuration, following `.env.example`. Keep private credentials out of Git and browser bundles.
+Use `.env.example` and the existing Supabase project. Keep private keys out of Git, browser bundles, URLs and logs.
 
 ```sh
 npm ci
@@ -29,18 +24,25 @@ npm run lint
 npm run build
 ```
 
-Read `AGENTS.md` and the installed Next.js documentation before changing framework integration. The implementation uses the existing versions and adds no runtime dependencies.
+Read `AGENTS.md` and installed Next.js docs before framework changes. No additional product dependencies were added for this iteration.
 
-## Database
+## Database and privacy
 
-Apply existing migrations in order after checking the target project's state. The image migration is `20261008000004_ai_cat_images.sql`; the gallery migration is `20261014000000_cat_rating.sql`. Do not blindly rerun an already-applied migration. Rollback role/ownership suites live under `supabase/tests/`.
+Apply migrations in order after checking the intended project's schema; do not blindly replay existing migrations. The meme migrations are `supabase/migrations/20261014000001_meme_captions.sql` and `20261015000000_meme_quota_clock.sql`. SQL permission suites in `supabase/tests/` roll back their fixtures.
 
-Public gallery RPCs return public image metadata and aggregate votes. Private prompts and system instructions remain owner-only. `publish_cat_image` accepts an owned generation ID, derives the scene from the saved generation, and lets the existing trigger derive the storage path. Original text posts are preserved and excluded from image rankings.
+Generation prompts/system instructions remain owner-readable. The public post stores the scene, caption and template snapshot that were actually generated. Publication validates ownership and copies trusted metadata; clients cannot create provider records or forge AI attribution. Existing votes retain add/switch/cancel semantics; generation/publication/voting/comments require login on the server and in RLS.
 
-## AI activation
+## Free-tier caption configuration
 
-See `docs/ai-cat-images.md`. Keep `GEMINI_IMAGE_ENABLED` absent or false until the owner authorizes provider configuration, billing and a live test budget. Successful local mocks and permission tests are not proof of a working provider. Do not expose service keys in logs, browser code or copied diagnostics.
+1. In Google AI Studio verify `Default Gemini Project` (`gen-lang-client-0496703209`) is **Free**. Use its existing key for the intended Vercel **Preview** environment; the owner enters and saves credentials personally. Do not send keys in chat.
+2. Keep server-only `GEMINI_API_KEY` and `SUPABASE_SERVICE_ROLE_KEY` configured in Vercel. Only after key/project verification, add the non-secret `GEMINI_TEXT_ENABLED=true` to Preview and deploy again. The adapter pins `gemini-3.1-flash-lite`; the documented model variable is descriptive, not permission to change to a paid model.
+3. Keep `GEMINI_IMAGE_ENABLED` absent/false. No billing activation, search tools, paid Imgflip AI endpoint, or paid fallback is part of this release.
+4. Complete a real caption → saved preview → publish → guest detail → vote test before describing the API as connected.
+
+Each account has 10 successful generations per New York day. The app globally caps provider attempts at 10 per rolling minute / 400 per Pacific day, including failures; other applications sharing the Google project can still exhaust its quota. A failed request releases the user reservation, retains the previous candidate and never automatically retries. Changing form parameters does not change the original candidate's publication metadata.
+
+The template catalog uses verified source metadata and a cached free Imgflip lookup. Published snapshots do not change when the catalog changes. Images depend on external sources; failed images have a retry action and captions stay readable.
 
 ## Verification and delivery
 
-See `docs/cat-rating-verification.md` for this iteration's actual checks and remaining live steps. The assignment needs a Vercel deployment URL verified against a concrete Git SHA, rather than only the mutable branch or production alias.
+See `docs/meme-caption-verification.md` for actual results and pending live steps. Deliver the unique Vercel URL verified against the product commit SHA, not a mutable alias. Product Manager / Feedback Group feedback and course submission are not implied by deployment.

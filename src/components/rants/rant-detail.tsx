@@ -59,16 +59,16 @@ export function RantDetail({
             )}
           </span>
         ) : null}
-        {rant.aiImageUrl ? (
+        {rant.aiImageUrl || rant.aiImageError ? (
           <figure className="ai-cat-figure">
-            {failedImage === rant.aiImageUrl ? (
+            {rant.aiImageError || failedImage === rant.aiImageUrl ? (
               <div className="gallery-state" role="alert">
                 <p>{t("imageMissing")}</p>
                 <a href={`/rants/${rant.id}`}>{t("retry")}</a>
               </div>
             ) : (
               <Image
-                src={rant.aiImageUrl}
+                src={rant.aiImageUrl!}
                 alt={t("aiPreview")}
                 width={1024}
                 height={1024}

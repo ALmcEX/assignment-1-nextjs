@@ -101,10 +101,25 @@ export function MemeComposer({
         [...data.caption].length > 300 ||
         data.templateId !== form.templateId ||
         data.prompt !== form.prompt.trim() ||
-        data.language !== form.language
+        data.language !== form.language ||
+        !data.template ||
+        data.template.id !== form.templateId ||
+        data.template.imageUrl !== template.imageUrl ||
+        data.template.sourceUrl !== template.sourceUrl ||
+        typeof data.template.name !== "string" ||
+        !data.template.name.trim() ||
+        [...data.template.name].length > 120 ||
+        typeof data.template.description !== "string" ||
+        [...data.template.description].length > 1000 ||
+        !Number.isInteger(data.template.width) ||
+        data.template.width < 1 ||
+        data.template.width > 10000 ||
+        !Number.isInteger(data.template.height) ||
+        data.template.height < 1 ||
+        data.template.height > 10000
       )
         throw new Error("aiFailed");
-      setCandidate({ ...data, template: { ...template } });
+      setCandidate({ ...data, template: { ...data.template } });
     } catch (e) {
       setError(errorKey(e));
     } finally {
