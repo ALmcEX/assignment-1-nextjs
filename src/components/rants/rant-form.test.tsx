@@ -18,5 +18,5 @@ it('keeps the previous image and story when a replacement fails',async()=>{
 });
 it('clearly labels the disabled feature and prevents generation before billing activation',()=>{
  render(<RantForm imageEnabled={false}/>);fireEvent.click(screen.getByText(/Create a cat image/));fireEvent.change(screen.getByLabelText('Location'),{target:{value:'Dorm'}});fireEvent.change(screen.getByLabelText('Describe your cat scene'),{target:{value:'A sleepy cat'}});
- expect(screen.getByRole('button',{name:'Generate cat image'}).matches(':disabled')).toBe(true);expect(screen.getByText(/Cat image generation is not enabled yet/)).toBeTruthy();
+ expect(screen.getByRole('button',{name:'Generate cat image'}).matches(':disabled')).toBe(true);expect(screen.getByText(/AI generation is not enabled yet/)).toBeTruthy();
 });
