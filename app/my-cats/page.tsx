@@ -1,8 +1,8 @@
 import { redirect } from "next/navigation";
-import { MyCats } from "@/src/components/cats/my-cats";
-import { getCats } from "@/src/lib/cats/queries";
+import { MyMemes } from "@/src/components/memes/my-memes";
+import { getMemes } from "@/src/lib/memes/queries";
 import { parseCatFilters } from "@/src/lib/cats/filters";
-import type { CatFeedItem } from "@/src/lib/cats/types";
+import type { MemeFeedItem } from "@/src/lib/memes/types";
 import { createServerSupabaseClient } from "@/src/lib/supabase/server";
 export default async function MyCatPage({
   searchParams,
@@ -15,16 +15,16 @@ export default async function MyCatPage({
   } = await client.auth.getUser();
   if (!user) redirect("/?auth=required");
   const filters = parseCatFilters({ page: (await searchParams).page });
-  let items: CatFeedItem[] = [];
+  let items: MemeFeedItem[] = [];
   let hasMore = false;
   let hasError = false;
   try {
-    ({ items, hasMore } = await getCats(client, filters, true));
+    ({ items, hasMore } = await getMemes(client, filters, true));
   } catch {
     hasError = true;
   }
   return (
-    <MyCats
+    <MyMemes
       items={items}
       user={user}
       page={filters.page}

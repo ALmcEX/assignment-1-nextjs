@@ -1,4 +1,4 @@
-import {findMemeTemplate} from "./templates";
+import { findMemeTemplate } from "./templates";
 import type { MemeSeed } from "./types";
 export type MemeFormDraft = MemeSeed & { title: string; location: string };
 function clean(value: unknown): MemeFormDraft | null {

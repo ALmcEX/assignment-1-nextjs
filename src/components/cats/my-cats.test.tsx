@@ -16,7 +16,7 @@ it("provides an honest empty gallery and a way to create", () => {
   );
   expect(screen.getByText("Your gallery starts with one idea.")).toBeTruthy();
   expect(
-    screen.getByRole("link", { name: /Create a cat/ }).getAttribute("href"),
+    screen.getByRole("link", { name: /Create a meme/ }).getAttribute("href"),
   ).toBe("/create");
 });
 it("shows query errors instead of claiming there are no works", () => {

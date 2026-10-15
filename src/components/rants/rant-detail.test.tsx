@@ -53,3 +53,9 @@ it("keeps the story readable when the image fails and offers a fresh page load",
   ).toBe("/rants/33333333-3333-4333-8333-333333333333");
   expect(screen.getByText(rant.body)).toBeTruthy();
 });
+
+it('shows AI caption with real template and public scene while preserving comments',async()=>{
+ const {findMemeTemplate}=await import('@/src/lib/memes/templates');
+ render(<RantDetail rant={{...rant,generation_id:rant.id,aiImageUrl:null,body:'Nope.',meme_template:findMemeTemplate('405658'),meme_scene:'Deadline tomorrow'}} user={null}/>);
+ expect(screen.getByText(/AI caption/)).toBeTruthy();expect(screen.getByRole('img',{name:'Grumpy Cat'})).toBeTruthy();expect(screen.getByText('Deadline tomorrow')).toBeTruthy();expect(screen.getByText('Nope.')).toBeTruthy();expect(screen.getByText('The conversation')).toBeTruthy();
+});

@@ -1,3 +1,4 @@
+import { getMemeSeed } from "@/src/lib/memes/queries";
 import { notFound } from "next/navigation";
 import { RantDetail } from "@/src/components/rants/rant-detail";
 import { createServerSupabaseClient } from "@/src/lib/supabase/server";
@@ -30,11 +31,19 @@ export default async function RantPage({
       /* Reading optional own parameters must not hide a published work. */
     }
   }
+  let memeSeed = null;
+  if (user && rant.meme_template) {
+    try {
+      memeSeed = await getMemeSeed(client, id);
+    } catch {
+      /* Optional owner reuse must not hide a published meme. */
+    }
+  }
   return (
     <RantDetail
       rant={rant}
       user={user}
-      canReuse={!!seed}
+      canReuse={!!memeSeed}
       breed={seed?.breed}
       style={seed?.style}
     />

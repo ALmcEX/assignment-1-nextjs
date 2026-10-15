@@ -1,7 +1,7 @@
-import { CatFeed } from "@/src/components/cats/cat-feed";
-import { getCats } from "@/src/lib/cats/queries";
+import { MemeFeed } from "@/src/components/memes/meme-feed";
+import { getMemes } from "@/src/lib/memes/queries";
 import { parseCatFilters } from "@/src/lib/cats/filters";
-import type { CatFeedItem } from "@/src/lib/cats/types";
+import type { MemeFeedItem } from "@/src/lib/memes/types";
 import { createServerSupabaseClient } from "@/src/lib/supabase/server";
 export default async function Home({
   searchParams,
@@ -10,7 +10,6 @@ export default async function Home({
     sort?: string;
     window?: string;
     page?: string;
-    samples?: string;
     auth?: string;
   }>;
 }) {
@@ -20,24 +19,21 @@ export default async function Home({
   const {
     data: { user },
   } = await client.auth.getUser();
-  const showSamples = params.samples === "1";
-  let items: CatFeedItem[] = [];
+  let items: MemeFeedItem[] = [];
   let hasMore = false;
   let hasError = false;
-  if (!showSamples)
-    try {
-      ({ items, hasMore } = await getCats(client, filters));
-    } catch {
-      hasError = true;
-    }
+  try {
+    ({ items, hasMore } = await getMemes(client, filters));
+  } catch {
+    hasError = true;
+  }
   return (
-    <CatFeed
+    <MemeFeed
       items={items}
       filters={filters}
       user={user}
       hasMore={hasMore}
       hasError={hasError}
-      showSamples={showSamples}
       authRequired={params.auth === "required"}
     />
   );

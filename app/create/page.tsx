@@ -1,4 +1,4 @@
-import {getMemeTemplates} from '@/src/lib/memes/templates';
+import { getMemeTemplates } from "@/src/lib/memes/templates";
 import { redirect } from "next/navigation";
 import { createServerSupabaseClient } from "@/src/lib/supabase/server";
 import { getMemeSeed } from "@/src/lib/memes/queries";

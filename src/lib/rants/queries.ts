@@ -8,7 +8,7 @@ export async function getRants(client:SupabaseClient,sort:'latest'|'popular',pag
 }
 export async function getRant(client:SupabaseClient,id:string,userId?:string,commentsPage=1):Promise<RantDetail|null> {
  if(!isUuid(id))return null;
- let {data,error}=await client.from('rants').select('id,title,location,body,image_path,ai_image_path,generation_id,is_example,created_at').eq('id',id).maybeSingle();
+ let {data,error}=await client.from('rants').select('id,title,location,body,image_path,ai_image_path,meme_template,meme_scene,generation_id,is_example,created_at').eq('id',id).maybeSingle();
  // Keep older rows readable while the additive storage migration rolls out.
  if(error?.code==='42703'){({data,error}=await client.from('rants').select('id,title,location,body,image_path,generation_id,is_example,created_at').eq('id',id).maybeSingle());}
  if(error)throw error;if(!data)return null;

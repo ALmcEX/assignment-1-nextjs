@@ -1,6 +1,6 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, expect, it, vi } from "vitest";
-import { CatFeed } from "./cat-feed";
+import { MemeFeed } from "./meme-feed";
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: vi.fn() }) }));
 afterEach(cleanup);
 const props = {
@@ -10,8 +10,8 @@ const props = {
   hasMore: true,
   hasError: false,
 };
-it("keeps filters across pages and resets pagination when switching sort", () => {
-  render(<CatFeed {...props} />);
+it("keeps filters on pagination and resets page on sort without fake samples", () => {
+  render(<MemeFeed {...props} />);
   expect(
     screen.getByRole("link", { name: "Popular" }).getAttribute("href"),
   ).not.toContain("page=");
@@ -19,15 +19,13 @@ it("keeps filters across pages and resets pagination when switching sort", () =>
     screen.getByRole("link", { name: /Next page/ }).getAttribute("href"),
   ).toContain("window=week");
   expect(screen.queryByText("Interface sample")).toBeNull();
-});
-it("keeps database errors separate from explicitly requested samples", () => {
-  render(<CatFeed {...props} hasError />);
-  expect(screen.getByRole("alert").textContent).toContain("could not load");
-  expect(screen.queryByText("Interface sample")).toBeNull();
-});
-it("labels original preview art and does not fabricate numeric votes", () => {
-  render(<CatFeed {...props} showSamples />);
-  expect(screen.getAllByText("Interface sample")).toHaveLength(4);
   expect(screen.queryByLabelText("Score")).toBeNull();
-  expect(screen.getByText(/not images generated live/)).toBeTruthy();
+  expect(
+    screen.getAllByRole("link", { name: /Create a meme/ }).length,
+  ).toBeGreaterThan(0);
+});
+it("does not hide database errors behind an empty gallery", () => {
+  render(<MemeFeed {...props} hasError />);
+  expect(screen.getByRole("alert").textContent).toContain("could not load");
+  expect(screen.queryByText("No memes published yet.")).toBeNull();
 });

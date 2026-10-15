@@ -1,8 +1,8 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, expect, it, vi } from "vitest";
 import { SiteHeader } from "./site-header";
-import { CatComposer } from "./cats/cat-composer";
-import { CatFeed } from "./cats/cat-feed";
+import { MemeComposer } from "./memes/meme-composer";
+import { MemeFeed } from "./memes/meme-feed";
 import { LanguageProvider, useLanguage } from "./language-provider";
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }),
@@ -21,7 +21,7 @@ it("links the new destinations and translates actions without changing authored 
   render(
     <LanguageProvider>
       <SiteHeader user={null} />
-      <CatComposer userId="owner" />
+      <MemeComposer userId="owner" templates={[]} />
       <Switch />
     </LanguageProvider>,
   );
@@ -29,20 +29,20 @@ it("links the new destinations and translates actions without changing authored 
     screen.getByRole("link", { name: /My creations/ }).getAttribute("href"),
   ).toBe("/my-cats");
   expect(
-    screen.getByRole("link", { name: /Create a cat/ }).getAttribute("href"),
+    screen.getByRole("link", { name: /Create a meme/ }).getAttribute("href"),
   ).toBe("/create");
-  fireEvent.change(screen.getByLabelText(/Your idea/), {
+  fireEvent.change(screen.getByLabelText(/Your scene/), {
     target: { value: "My original idea" },
   });
   fireEvent.click(screen.getByText("Switch test language"));
   expect(screen.getByRole("button", { name: /保存想法到本机/ })).toBeTruthy();
-  expect((screen.getByLabelText(/你的想法/) as HTMLTextAreaElement).value).toBe(
+  expect((screen.getByLabelText(/你的场景/) as HTMLTextAreaElement).value).toBe(
     "My original idea",
   );
 });
 it("explains why a protected-page visitor was sent home", () => {
   render(
-    <CatFeed
+    <MemeFeed
       items={[]}
       filters={{ sort: "latest", window: "all", page: 1 }}
       user={null}

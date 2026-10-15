@@ -1,4 +1,5 @@
 "use client";
+import { MemeImage } from "../memes/meme-image";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
@@ -48,11 +49,13 @@ export function RantDetail({
           <span className="ai-badge">
             ✦{" "}
             {t(
-              rant.is_example
-                ? "aiExample"
-                : rant.ai_image_path
-                  ? "aiCatGenerated"
-                  : "aiGenerated",
+              rant.meme_template
+                ? "aiCaption"
+                : rant.is_example
+                  ? "aiExample"
+                  : rant.ai_image_path
+                    ? "aiCatGenerated"
+                    : "aiGenerated",
             )}
           </span>
         ) : null}
@@ -80,7 +83,32 @@ export function RantDetail({
             </figcaption>
           </figure>
         ) : null}
-        <p className="rant-body">{rant.body}</p>
+        <p
+          className={
+            rant.meme_template ? "meme-caption detail-caption" : "rant-body"
+          }
+        >
+          {rant.body}
+        </p>
+        {rant.meme_template ? (
+          <figure className="meme-detail-figure">
+            <MemeImage
+              key={rant.meme_template.imageUrl}
+              template={rant.meme_template}
+            />
+            <figcaption>
+              <a
+                href={rant.meme_template.sourceUrl}
+                target="_blank"
+                rel="noreferrer"
+              >
+                {t("templateSource")} · {rant.meme_template.name} ↗
+              </a>
+            </figcaption>
+            <p className="field-hint">{t("memeScene")}</p>
+            <p>{rant.meme_scene}</p>
+          </figure>
+        ) : null}
         {canReuse ? (
           <Link
             className="primary-link reuse-link"

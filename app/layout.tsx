@@ -6,8 +6,8 @@ import { createServerSupabaseClient } from "@/src/lib/supabase/server";
 import { LanguageProvider } from "@/src/components/language-provider";
 
 export const metadata: Metadata = {
-  title: "CatCanvas | A world of imagined cats",
-  description: "Turn your ideas into AI cat images. Explore, vote, and come back to create something new.",
+  title: "CatCanvas | Your life, in cat memes",
+  description: "Turn everyday moments into cat memes with AI captions. Explore, vote, and find your next idea.",
 };
 
 export default async function RootLayout({ children }: { children: ReactNode }) {
