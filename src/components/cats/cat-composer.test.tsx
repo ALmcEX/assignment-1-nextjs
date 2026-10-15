@@ -139,3 +139,14 @@ it("keeps caption edits separate from generation and publishes only the caption"
   await waitFor(() => expect(publishCat).toHaveBeenCalledWith({}, expect.objectContaining({ caption: "Late shift" })));
   expect(request).toHaveBeenCalledTimes(1);
 });
+
+
+it("normalizes reused image parameters to English with no language selector", async () => {
+ const f=vi.fn().mockResolvedValue({ok:false,json:async()=>({error:"aiFailed"})});
+ vi.stubGlobal("fetch",f);
+ render(<CatComposer userId="owner" imageEnabled seed={{prompt:"A cat",breed:"orange",style:"illustration",language:"zh-CN"}}/>);
+ expect(screen.queryByLabelText("Language")).toBeNull();
+ fireEvent.click(screen.getByRole("button",{name:"Generate cat image"}));
+ await screen.findByRole("alert");
+ expect(JSON.parse(f.mock.calls[0][1].body).language).toBe("en");
+});

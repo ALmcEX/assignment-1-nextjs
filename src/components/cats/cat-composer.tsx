@@ -35,7 +35,7 @@ export function CatComposer({
   imageEnabled?: boolean;
   seed?: CatSeed;
 }) {
-  const { t, language } = useLanguage();
+  const { t } = useLanguage();
   const router = useRouter();
   const [form, setForm] = useState<CatFormDraft>({
     prompt: "",
@@ -44,8 +44,8 @@ export function CatComposer({
     location: "",
     breed: "orange",
     style: "illustration",
-    language,
     ...seed,
+    language: "en",
   });
   const [preview, setPreview] = useState<{
     imageUrl: string;
@@ -62,7 +62,7 @@ export function CatComposer({
       const saved = readLocalDraft(userId);
       if (saved)
         queueMicrotask(() => {
-          if (active) setForm(saved);
+          if (active) setForm({ ...saved, language: "en" });
         });
     }
     return () => {
@@ -99,7 +99,7 @@ export function CatComposer({
           location: form.location.trim(),
           breed: form.breed,
           style: form.style,
-          language: form.language,
+          language: "en",
         }),
       });
       const data = await response.json();
@@ -209,19 +209,6 @@ export function CatComposer({
                   ))}
                 </select>
               </label>
-            </div>
-            <div className="field">
-              <label htmlFor="cat-output-language">{t("language")}</label>
-              <select
-                id="cat-output-language"
-                value={form.language}
-                onChange={(e) =>
-                  update("language", e.target.value as CatFormDraft["language"])
-                }
-              >
-                <option value="en">English</option>
-                <option value="zh-CN">简体中文</option>
-              </select>
             </div>
             </section>
             <section className="image-caption-block" aria-labelledby="image-caption-heading">

@@ -15,9 +15,9 @@ import { useLanguage } from "../language-provider";
 export function MemeComposer({ userId, templates, seed, textEnabled = false }: {
   userId: string; templates: MemeTemplate[]; seed?: MemeSeed; textEnabled?: boolean;
 }) {
-  const { t, language } = useLanguage();
+  const { t } = useLanguage();
   const router = useRouter();
-  const [form, setForm] = useState<MemeFormDraft>({ prompt: "", templateId: templates[0]?.id ?? "", language, title: "", location: "", ...seed });
+  const [form, setForm] = useState<MemeFormDraft>({ prompt: "", templateId: templates[0]?.id ?? "", title: "", location: "", ...seed, language: "en" });
   const [source, setSource] = useState<"preset" | "upload">(seed?.photoTemplate ? "upload" : "preset");
   const [reusePhoto, setReusePhoto] = useState(!!seed?.photoTemplate);
   const [photo, setPhoto] = useState<File | null>(null);
@@ -31,7 +31,7 @@ export function MemeComposer({ userId, templates, seed, textEnabled = false }: {
   const pending = useRef(false);
   useEffect(() => {
     let active = true;
-    if (!seed) { const saved = readMemeDraft(userId); if (saved) queueMicrotask(() => { if (active) setForm(saved); }); }
+    if (!seed) { const saved = readMemeDraft(userId); if (saved) queueMicrotask(() => { if (active) setForm({ ...saved, language: "en" }); }); }
     return () => { active = false; };
   }, [userId, seed]);
   useEffect(() => () => { if (photoUrl) URL.revokeObjectURL(photoUrl); }, [photoUrl]);
@@ -52,7 +52,7 @@ export function MemeComposer({ userId, templates, seed, textEnabled = false }: {
     pending.current = true; setBusy("generate"); setError(null); setStatus(null);
     try {
       const body = new FormData();
-      body.set("prompt", form.prompt.trim()); body.set("language", form.language);
+      body.set("prompt", form.prompt.trim()); body.set("language", "en");
       body.set("templateId", source === "upload" ? "uploaded" : form.templateId);
       if (source === "upload" && photo) {
         body.set("photo", photo); body.set("width", String(dimensions.width)); body.set("height", String(dimensions.height));
@@ -112,7 +112,6 @@ export function MemeComposer({ userId, templates, seed, textEnabled = false }: {
             <textarea id="meme-scene" rows={4} placeholder={t("memeScenePlaceholder")} value={form.prompt} onChange={e => update("prompt", e.target.value)} />
             <small className="field-hint">{t("captionSceneHint")}</small>
           </div>
-          <label className="field" htmlFor="caption-language">{t("captionLanguage")}<select id="caption-language" value={form.language} onChange={e => update("language", e.target.value as MemeSeed["language"])}><option value="en">English</option><option value="zh-CN">简体中文</option></select></label>
           <label className="field" htmlFor="meme-location">{t("optionalLocation")}<input id="meme-location" value={form.location} onChange={e => update("location", e.target.value)} /></label>
         </fieldset>
         <p className="field-hint">{t("captionBatchQuota")}</p>

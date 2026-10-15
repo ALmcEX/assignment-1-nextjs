@@ -43,15 +43,15 @@ it("keeps caption, publication date and source when an image fails and retries",
     screen.getByRole("button", { name: "Continue with Google" }),
   ).toBeTruthy();
 });
-it("translates labels without changing generated text", () => {
+it("keeps English labels without changing generated text", () => {
   localStorage.setItem("city-vent-language", "zh-CN");
   render(
     <LanguageProvider>
       <MemeCard item={item} user={null} />
     </LanguageProvider>,
   );
-  expect(screen.getByText(/AI 配文/)).toBeTruthy();
-  expect(screen.getByRole("link", { name: /模板来源/ })).toBeTruthy();
+  expect(screen.getByText(/AI caption/)).toBeTruthy();
+  expect(screen.getByRole("link", { name: /Template source/ })).toBeTruthy();
   expect(screen.getByText("<b>Nope.</b>")).toBeTruthy();
 });
 

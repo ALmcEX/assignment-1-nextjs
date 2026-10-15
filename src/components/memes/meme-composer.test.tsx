@@ -73,9 +73,6 @@ it("publishes the original candidate after form edits and retains it when replac
   fireEvent.change(screen.getByLabelText(/Your scene/), {
     target: { value: "different" },
   });
-  fireEvent.change(screen.getByLabelText("Caption language"), {
-    target: { value: "zh-CN" },
-  });
   expect(screen.getByText(/Preview scene: deadline/)).toBeTruthy();
   fireEvent.click(screen.getByRole("button", { name: "Generate again" }));
   await screen.findByRole("alert");
@@ -171,4 +168,15 @@ it("sends the chosen photo and shows four captions without using the image-gener
   expect(form.get("templateId")).toBe("uploaded");
   expect((form.get("photo") as File).name).toBe("cat.png");
   expect(screen.getByRole("button", { name: /Nap first/ })).toBeTruthy();
+});
+
+
+it("normalizes a reused Chinese scene to English without showing a language selector", async () => {
+ const f = vi.fn().mockResolvedValue({ ok: false, json: async () => ({error:"aiFailed"}) });
+ vi.stubGlobal("fetch", f);
+ render(<MemeComposer userId="a" templates={templates} textEnabled seed={{ prompt:"deadline",templateId:templates[0].id,language:"zh-CN" }}/>);
+ expect(screen.queryByLabelText("Caption language")).toBeNull();
+ fireEvent.click(screen.getByRole("button", { name:"Generate caption" }));
+ await screen.findByRole("alert");
+ expect((f.mock.calls[0][1].body as FormData).get("language")).toBe("en");
 });
