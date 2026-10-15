@@ -26,3 +26,7 @@ This bounds image requests made through this app, not unrelated Google project u
 Local tests174/174, lint/build and lifetime SQL budget + all existing SQL suites passed before deployment. Live image/provider verification pending owner billing and secret entry. No paid provider request has been made for this iteration at this point.
 
 Sources: https://ai.google.dev/gemini-api/docs/pricing and https://ai.google.dev/gemini-api/docs/generate-content/image-generation
+
+## Owner configuration handoff
+
+Owner reports image key saved (key name CatMeme). Native Chrome verification shows separate project CatMeme test (`gen-lang-client-0265715630`) at Tier1, while Default Gemini Project (`gen-lang-client-0496703209`) remains Free tier. Live provider acceptance and final OAuth callback remain pending; no provider success is claimed by this configuration note.
