@@ -13,7 +13,14 @@ export async function generateDraft(input: DraftInput): Promise<GeneratedDraft> 
   body:JSON.stringify({systemInstruction:{parts:[{text:systemPrompt}]},contents:[{role:'user',parts:[{text:input.prompt}]}],generationConfig:{responseModalities:['IMAGE'],candidateCount:1,maxOutputTokens:4096,responseFormat:{image:{aspectRatio:'1:1',imageSize:'1K'}}}}),
   signal:AbortSignal.timeout(90000),
  });
- if (!response.ok) throw new Error(`Gemini HTTP ${response.status}`);
+ if (!response.ok) {
+  const failure = await response.json().catch(()=>null);
+  const message = typeof failure?.error?.message === 'string' ? failure.error.message : '';
+  const code = ['INVALID_ARGUMENT','PERMISSION_DENIED','NOT_FOUND','RESOURCE_EXHAUSTED','UNAUTHENTICATED','FAILED_PRECONDITION'].includes(failure?.error?.status) ? failure.error.status : 'UNKNOWN';
+  const fields = ['responseFormat','response_format','imageConfig','image_config','responseModalities','response_modalities','systemInstruction','system_instruction','candidateCount','candidate_count','maxOutputTokens','max_output_tokens','imageSize','image_size','model'].filter(field=>message.includes(field));
+  console.error('Image provider rejected request',{status:response.status,code,fields,invalidKey:/API key not valid|invalid api key/i.test(message),unknownField:/unknown name|unknown field|cannot find field/i.test(message),unsupported:/not supported|unsupported|not available/i.test(message)});
+  throw new Error(`Gemini HTTP ${response.status}`);
+ }
  const raw = await response.text(); if (raw.length > 8000000) throw new Error('aiFailed');
  const json = JSON.parse(raw); const candidate = json.candidates?.[0];
  if (candidate?.finishReason !== 'STOP') throw new Error('aiFailed');

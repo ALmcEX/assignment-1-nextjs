@@ -32,3 +32,11 @@ test('does not use the free caption key for paid image calls',async()=>{
  vi.stubEnv('GEMINI_API_KEY','caption-key');vi.stubEnv('GEMINI_IMAGE_API_KEY','');const f=vi.fn();vi.stubGlobal('fetch',f);
  await expect(generateDraft(input)).rejects.toThrow('aiUnavailable');expect(f).not.toHaveBeenCalled();
 });
+test('logs only allowlisted provider diagnostics for a rejected request',async()=>{
+ vi.stubEnv('GEMINI_IMAGE_API_KEY','test-secret');
+ const log=vi.spyOn(console,'error').mockImplementation(()=>{});
+ vi.stubGlobal('fetch',vi.fn().mockResolvedValue(new Response(JSON.stringify({error:{status:'INVALID_ARGUMENT',message:'Invalid JSON payload received. Unknown name "responseFormat" at generationConfig. private prompt test-secret'}}),{status:400})));
+ await expect(generateDraft(input)).rejects.toThrow('Gemini HTTP 400');
+ expect(log).toHaveBeenCalledWith('Image provider rejected request',{status:400,code:'INVALID_ARGUMENT',fields:['responseFormat'],invalidKey:false,unknownField:true,unsupported:false});
+ expect(JSON.stringify(log.mock.calls)).not.toContain('test-secret');expect(JSON.stringify(log.mock.calls)).not.toContain('private prompt');log.mockRestore();
+});
