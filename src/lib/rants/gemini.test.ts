@@ -25,7 +25,7 @@ test('pins the approved image model and caps output even with a model override',
  vi.stubEnv('GEMINI_IMAGE_API_KEY','test-secret');vi.stubEnv('GEMINI_IMAGE_MODEL','expensive-unapproved');
  const f=vi.fn().mockResolvedValue(new Response(JSON.stringify({candidates:[{finishReason:'STOP',content:{parts:[{inlineData:{mimeType:'image/png',data:png}}]}}]})));vi.stubGlobal('fetch',f);
  await generateDraft(input);expect(f.mock.calls[0][0]).toContain('gemini-3.1-flash-lite-image:');
- const c=JSON.parse(f.mock.calls[0][1].body).generationConfig;expect(c.candidateCount).toBe(1);expect(c.maxOutputTokens).toBe(4096);expect(c.responseFormat.image.imageSize).toBe('1K');
+ const c=JSON.parse(f.mock.calls[0][1].body).generationConfig;expect(c.candidateCount).toBe(1);expect(c.maxOutputTokens).toBe(4096);expect(c.responseFormat.image.imageSize).toBe('IMAGE_SIZE_ONE_K');expect(c.responseFormat.image.aspectRatio).toBe('ASPECT_RATIO_ONE_BY_ONE');
 });
 
 test('does not use the free caption key for paid image calls',async()=>{

@@ -30,3 +30,5 @@ Sources: https://ai.google.dev/gemini-api/docs/pricing and https://ai.google.dev
 ## Owner configuration handoff
 
 Owner reports image key saved (key name CatMeme). Native Chrome verification shows separate project CatMeme test (`gen-lang-client-0265715630`) at Tier1, while Default Gemini Project (`gen-lang-client-0496703209`) remains Free tier. Live provider acceptance and final OAuth callback remain pending; no provider success is claimed by this configuration note.
+
+Provider acceptance debugging: two initial requests were rejectedHTTP400 at response_format.image_size. REST reference requires IMAGE_SIZE_ONE_K and ASPECT_RATIO_ONE_BY_ONE in responseFormat, rather than SDK shorthand. Regression test reproduced the mismatch before the fix. Lifetime attempt counter was not reset.
