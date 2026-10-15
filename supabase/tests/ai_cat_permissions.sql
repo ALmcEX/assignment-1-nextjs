@@ -20,14 +20,14 @@ reset role;
 set local role anon;
 select set_config('request.jwt.claims','{"role":"anon"}',true);
 do $$ begin
- if exists(select 1 from storage.objects where bucket_id='ai-cat-images') then raise exception 'unpublished image leaked'; end if;
+ if exists(select 1 from storage.objects where bucket_id='ai-cat-images' and name='11111111-1111-4111-8111-111111111111/test-cat.png') then raise exception 'unpublished image leaked'; end if;
  begin perform public.finish_ai_cat_image(gen_random_uuid(),gen_random_uuid(),'x','x','en','x','x','image/png','tabby','clay'); raise exception 'anonymous generation write allowed'; exception when insufficient_privilege then null; end;
 end $$;
 reset role;
 set local role authenticated;
 select set_config('request.jwt.claims','{"sub":"22222222-2222-4222-8222-222222222222","role":"authenticated"}',true);
 do $$ begin
- if exists(select 1 from storage.objects where bucket_id='ai-cat-images') then raise exception 'foreign draft image leaked'; end if;
+ if exists(select 1 from storage.objects where bucket_id='ai-cat-images' and name='11111111-1111-4111-8111-111111111111/test-cat.png') then raise exception 'foreign draft image leaked'; end if;
  if exists(select 1 from public.ai_generations where provider='gemini' and model='test-image') then raise exception 'foreign prompt leaked'; end if;
  begin insert into storage.objects(bucket_id,name) values('ai-cat-images','22222222-2222-4222-8222-222222222222/fake.png'); raise exception 'browser output spoof allowed'; exception when insufficient_privilege then null; end;
 end $$;

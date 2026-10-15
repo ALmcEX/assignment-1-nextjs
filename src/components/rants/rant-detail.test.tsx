@@ -42,3 +42,14 @@ it("preserves historical text and hides reuse for unowned creations", () => {
     screen.queryByRole("link", { name: /Use this idea again/ }),
   ).toBeNull();
 });
+
+it("keeps the story readable when the image fails and offers a fresh page load", async () => {
+  const { fireEvent } = await import("@testing-library/react");
+  render(<RantDetail rant={rant} user={null} />);
+  fireEvent.error(screen.getByRole("img", { name: "Your AI-generated cat" }));
+  expect(screen.getByRole("alert").textContent).toContain("Image unavailable");
+  expect(
+    screen.getByRole("link", { name: "Try again" }).getAttribute("href"),
+  ).toBe("/rants/33333333-3333-4333-8333-333333333333");
+  expect(screen.getByText(rant.body)).toBeTruthy();
+});

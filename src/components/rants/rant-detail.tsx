@@ -1,6 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
 import type { User } from "@supabase/supabase-js";
 import type { RantDetail as Detail } from "@/src/lib/rants/types";
 import type { CatBreed, CatStyle } from "@/src/lib/rants/cat-options";
@@ -21,6 +22,7 @@ export function RantDetail({
   style?: CatStyle;
 }) {
   const { t, language } = useLanguage();
+  const [failedImage, setFailedImage] = useState<string | null>(null);
   return (
     <main className="detail-shell">
       <Link className="back-link" href="/">
@@ -56,13 +58,21 @@ export function RantDetail({
         ) : null}
         {rant.aiImageUrl ? (
           <figure className="ai-cat-figure">
-            <Image
-              src={rant.aiImageUrl}
-              alt={t("aiPreview")}
-              width={1024}
-              height={1024}
-              unoptimized
-            />
+            {failedImage === rant.aiImageUrl ? (
+              <div className="gallery-state" role="alert">
+                <p>{t("imageMissing")}</p>
+                <a href={`/rants/${rant.id}`}>{t("retry")}</a>
+              </div>
+            ) : (
+              <Image
+                src={rant.aiImageUrl}
+                alt={t("aiPreview")}
+                width={1024}
+                height={1024}
+                unoptimized
+                onError={() => setFailedImage(rant.aiImageUrl ?? null)}
+              />
+            )}
             <figcaption>
               ✦ {t("aiCatGenerated")}
               {breed ? ` · ${t(breedKey[breed])}` : ""}

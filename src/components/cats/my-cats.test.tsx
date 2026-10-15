@@ -32,3 +32,34 @@ it("shows query errors instead of claiming there are no works", () => {
   expect(screen.getByRole("alert")).toBeTruthy();
   expect(screen.queryByText("Your gallery starts with one idea.")).toBeNull();
 });
+
+it("shows publication dates so similar personal creations can be distinguished", () => {
+  render(
+    <MyCats
+      items={[
+        {
+          id: "cat",
+          title: "A cat",
+          body: "A cat",
+          location: "",
+          created_at: "2026-10-14T02:00:00Z",
+          ai_image_path: "owner/cat.png",
+          breed: "orange",
+          style: "clay",
+          totals: { upvotes: 0, downvotes: 0, score: 0 },
+          myVote: null,
+          canReuse: true,
+          imageUrl: null,
+          imageError: true,
+        },
+      ]}
+      user={{ id: "owner" } as User}
+      page={1}
+      hasMore={false}
+      hasError={false}
+    />,
+  );
+  expect(screen.getByText("Oct 13, 2026").getAttribute("datetime")).toBe(
+    "2026-10-14T02:00:00Z",
+  );
+});

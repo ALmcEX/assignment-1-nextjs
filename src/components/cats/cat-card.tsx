@@ -26,7 +26,7 @@ export function CatCard({
   item: CatFeedItem;
   user: User | null;
 }) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [failedUrl, setFailedUrl] = useState<string | null>(null);
   return (
     <article className="cat-card">
@@ -58,6 +58,17 @@ export function CatCard({
           <h2>{item.title}</h2>
         </Link>
         <p className="cat-caption">{item.body}</p>
+        <time className="cat-publication-date" dateTime={item.created_at}>
+          {new Date(item.created_at).toLocaleDateString(
+            language === "en" ? "en-US" : "zh-CN",
+            {
+              month: "short",
+              day: "numeric",
+              year: "numeric",
+              timeZone: "America/New_York",
+            },
+          )}
+        </time>
         <div className="cat-card-bottom">
           <CatVoteControls
             id={item.id}
