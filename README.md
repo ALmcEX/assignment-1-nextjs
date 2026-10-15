@@ -34,6 +34,8 @@ Generation prompts/system instructions remain owner-readable. The public post st
 
 ## Free-tier caption configuration
 
+Preview caption generation was activated and verified on 2026-10-15 with real English/Chinese outputs. Production and paid image generation remain disabled. See the verification record for scope and evidence.
+
 1. In Google AI Studio verify `Default Gemini Project` (`gen-lang-client-0496703209`) is **Free**. Use its existing key for the intended Vercel **Preview** environment; the owner enters and saves credentials personally. Do not send keys in chat.
 2. Keep server-only `GEMINI_API_KEY` and `SUPABASE_SERVICE_ROLE_KEY` configured in Vercel. Only after key/project verification, add the non-secret `GEMINI_TEXT_ENABLED=true` to Preview and deploy again. The adapter pins `gemini-3.1-flash-lite`; the documented model variable is descriptive, not permission to change to a paid model.
 3. Keep `GEMINI_IMAGE_ENABLED` absent/false. No billing activation, search tools, paid Imgflip AI endpoint, or paid fallback is part of this release.

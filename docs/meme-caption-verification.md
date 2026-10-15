@@ -26,10 +26,21 @@ The quota lock-wait regression was also reproduced against the live database wit
 
 No deferred minor findings. The reviewer excluded live configuration/deployment evidence (still executor responsibilities) and superseded unused composer presentation (not reachable in the current product).
 
-## Pending
+## Live API and acceptance (2026-10-15)
 
-The user is manually verifying/replacing the Preview Gemini credential with the known free-project key. Text generation remains disabled until that handoff is complete. No real provider success is claimed yet. Authenticated live generation/save/publication, browser vote/comment/reuse, final layout screenshots and matching commit-specific deployment verification remain to be recorded. A localhost login attempt fell back to an old deployment; authenticated acceptance must be verified on the new deployed callback.
+The owner saved the free Default Gemini Project key into Vercel Preview. `GEMINI_TEXT_ENABLED=true` is scoped to Preview; the image switch remains absent/false. The same product commit `01d9495b9be941097e02f925a561c62f0784d77a` was redeployed with updated settings. GitHub deployment status reported success at `https://assignment-1-nextjs-2iizq1l4w-almcex.vercel.app` (a unique URL, not the branch alias).
 
-PM/group feedback has not been supplied. No course submission has been performed.
+Two real Gemini captions were generated, saved and published through the browser:
 
-Evidence directory: `/Users/alex/Documents/Design for AI/assignment-4-evidence/meme-caption-2026-10-14/`; screenshots and execution ledger must contain no credential values.
+- English / Grumpy Cat: “I was told there would be a nap.” Post `19008ed3-11fd-4943-9cd9-17d14d3ac82d`, title “One deadline down”.
+- Chinese / Woman Yelling At Cat: “组员：为什么还没写完作业？ 我：猫饿了，这是大自然不可抗拒的召唤。” Post `550333e6-659d-4dfc-a20e-ab4adfb0c042`, title “猫说这才是优先级”.
+
+These are actual API outputs and owner-published acceptance examples, not fake engagement. Vote add → switch → cancel was verified on the English detail; both posts have net score zero after testing. One clearly labeled functional-check comment was saved. The personal gallery shows both posts; the owned reuse form restored the original English scene, template and language. A separate signed-out browser displayed the same public captions/templates and zero scores without private reuse controls.
+
+Google account selection and callback landing on the homepage were verified at localhost:3000 and the existing branch Preview domain. A localhost:3014 attempt fell back to the site URL because that port is not allowlisted; it was not counted as successful. The owner-authorized `jsr28qn72` callback was added explicitly. Vercel redeployment creates new unique hostnames, so any final hostname needs its own precise callback authorization; no wildcard authorization was added.
+
+IAB mobile public gallery at 390px had scrollWidth=390; desktop creator showed two columns, actual templates, bilingual controls, and valid device draft save/clear. Chrome viewport overrides did not change the actual page width; no mobile-creator claim is based on those screenshots. All viewport overrides were reset. Related broken-image and provider-failure behavior is covered by tests.
+
+PM/group feedback has not been supplied. No course submission has been performed. Image billing and paid generation remain unauthorized and disabled.
+
+Evidence directory: `/Users/alex/Documents/Design for AI/assignment-4-evidence/meme-caption-2026-10-14/`. `release.json` records the final source SHA, unique URL and remaining release steps; screenshots and the execution ledger contain no credential values.
