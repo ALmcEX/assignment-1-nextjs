@@ -1,3 +1,15 @@
+# Current CatCanvas flow (2026-10-14)
+
+The user approved replacing the rant-first product with idea -> AI cat image -> community voting. `/create` is the protected studio; location/title are optional. `/` shows only verified published image generations. `/my-cats` supports owned prompt reuse; `/rants/[id]` retains stable detail URLs and historical posts. Browser-only drafts contain editable parameters, scoped by account, never image URLs or generation IDs.
+
+The image flag stays disabled. Preview art at `/?samples=1` is labeled original interface illustration, not live generated media. No paid generation or credential configuration was performed for this redesign.
+
+Apply the existing image migration only if absent, then `20261014000000_cat_rating.sql`. The new rollback suite is `supabase/tests/cat_rating_permissions.sql`. Live provider activation still requires owner billing approval and a test budget. Confirm the current official provider model/API when activation begins; the previous default is not a verification of current availability.
+
+The following notes describe the previous implementation and its storage foundations. The new product design supersedes the old homepage and required rant-field descriptions.
+
+---
+
 # AI cat images
 
 ## Approved change

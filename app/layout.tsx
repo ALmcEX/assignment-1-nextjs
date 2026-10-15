@@ -6,8 +6,8 @@ import { createServerSupabaseClient } from "@/src/lib/supabase/server";
 import { LanguageProvider } from "@/src/components/language-provider";
 
 export const metadata: Metadata = {
-  title: "CITY / VENT · Columbia & NYC",
-  description: "A place to share the little frustrations of Columbia and New York life.",
+  title: "CatCanvas | A world of imagined cats",
+  description: "Turn your ideas into AI cat images. Explore, vote, and come back to create something new.",
 };
 
 export default async function RootLayout({ children }: { children: ReactNode }) {
