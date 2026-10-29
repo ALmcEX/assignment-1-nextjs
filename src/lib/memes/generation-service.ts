@@ -1,9 +1,11 @@
+import type { ObservationRunner } from "../observability/registry";
 import { RantError, textField } from "../rants/validation";
 import { findMemeTemplate } from "./templates";
 import { validateCaption } from "./gemini";
 import type { CaptionCandidate, MemeSeed, MemeTemplate } from "./types";
 type Generated = { caption: string; model: string; systemPrompt: string };
 export type MemeGenerationDependencies = {
+  observe?: ObservationRunner;
   configured: boolean;
   reserveUser: (id: string) => Promise<string>;
   releaseUser: (id: string, token: string) => Promise<void>;
@@ -42,22 +44,37 @@ export async function createMemeDraft(
   if (!deps.configured) throw new RantError("aiUnavailable");
   const seed = validateMemeSeed(input);
   const template = findMemeTemplate(seed.templateId)!;
-  const token = await deps.reserveUser(userId);
-  try {
-    await deps.reserveAttempt();
-    const generated = await deps.generate(seed, template);
-    const caption = validateCaption(generated.caption);
-    const generationId = await deps.save({
-      userId,
-      token,
-      seed,
-      template,
-      ...generated,
-      caption,
-    });
-    return { ...seed, generationId, caption, template };
-  } catch (error) {
-    await deps.releaseUser(userId, token).catch(() => {});
-    throw error instanceof RantError ? error : new RantError("aiFailed");
-  }
+  const run = async () => {
+    const token = await deps.reserveUser(userId);
+    try {
+      await deps.reserveAttempt();
+      const generated = await deps.generate(seed, template);
+      const caption = validateCaption(generated.caption);
+      const generationId = await deps.save({
+        userId,
+        token,
+        seed,
+        template,
+        ...generated,
+        caption,
+      });
+      return { ...seed, generationId, caption, template };
+    } catch (error) {
+      await deps.releaseUser(userId, token).catch(() => {});
+      throw error instanceof RantError ? error : new RantError("aiFailed");
+    }
+  };
+  return deps.observe
+    ? deps.observe(
+        {
+          prompt: seed.prompt,
+          metadata: {
+            language: seed.language,
+            template_id: seed.templateId,
+            has_photo: false,
+          },
+        },
+        run,
+      )
+    : run();
 }
