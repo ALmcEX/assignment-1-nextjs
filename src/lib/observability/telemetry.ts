@@ -245,7 +245,11 @@ export async function observedFetch(
     }
     await record(c, payload);
   } catch {
-    diagnostic();
+    await record(c, {
+      http_status: response.status,
+      error_code: "providerBodyReadFailed",
+      duration_ms: Math.max(0, Math.min(86400000, Math.round(performance.now() - start))),
+    });
   }
   return response;
 }

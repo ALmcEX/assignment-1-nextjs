@@ -205,3 +205,14 @@ describe("generation telemetry", () => {
     expect(projected.output_json).toMatchObject({ mime_type: "image/png" });
   });
 });
+
+it('preserves actual HTTP status when the response body aborts', async () => {
+ const f=fixture();
+ vi.stubGlobal('fetch',async()=>new Response(new ReadableStream({start(controller){controller.error(new Error('private transport details'));}}),{status:200}));
+ await expect(withGenerationTelemetry(f.client,id,'caption_choices',{prompt:'cat',metadata:{}},async()=>{
+  const response=await observedFetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent');
+  await response.text();return {generationId:id};
+ })).rejects.toThrow();
+ expect(f.calls.find(c=>c.name==='record_llm_response')?.args.p_response).toMatchObject({http_status:200,error_code:'providerBodyReadFailed'});
+ expect(JSON.stringify(f.calls)).not.toContain('private transport details');
+});
