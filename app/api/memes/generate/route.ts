@@ -1,3 +1,4 @@
+import { withGenerationTelemetry } from "@/src/lib/observability/telemetry";
 import { createServerSupabaseClient } from "@/src/lib/supabase/server";
 import { createAdminSupabaseClient } from "@/src/lib/supabase/admin";
 import {
@@ -44,6 +45,8 @@ export async function POST(request: Request) {
     const admin = createAdminSupabaseClient();
     const result = await createMemeDraft(user.id, seed, {
       configured: true,
+      observe: (input, run) =>
+        withGenerationTelemetry(admin, user.id, "meme_caption", input, run),
       generate: generateMemeCaption,
       reserveUser: async (id) => {
         const { data, error } = await admin.rpc("reserve_ai_generation", {
