@@ -1,5 +1,6 @@
 export type Language = 'en' | 'zh-CN';
 const messages = {
+ captionChooseFile:['Choose file','选择文件'],
  creationMode:['Creation mode','创作模式'], imageGallery:['AI cat images','AI 猫图'], imageCollection:['My AI cat images','我的 AI 猫图'],
  imageBudgetHint:['Image generation is in a limited test: 10 requests shared across the app. Failed requests also count.','生图测试阶段：全应用共 10 次请求，失败也计入测试额度。'],
  memeEyebrow:['FAMILIAR CATS. FRESH WORDS.','熟悉的猫咪，全新的表达。'], memeGalleryTitle:['Life happens. Cats get it.','你的生活，猫懂。'], memeGalleryIntro:['Turn a meme or your own photo into a story. Pick one of four AI captions, share it, and vote for your favorites.','选择表情包或上传照片，从四条 AI 配文中选出最喜欢的一条。分享你的生活，为有共鸣的作品投票。'], communityVotes:['Community votes','社区投票'], memeEmpty:['No memes published yet.','还没有发布的 Meme。'], memeFooter:['Same cats. New perspectives.','熟悉的猫咪，不同的视角。'],

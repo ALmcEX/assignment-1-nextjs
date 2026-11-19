@@ -22,6 +22,7 @@ export function MemeComposer({ userId, templates, seed, textEnabled = false }: {
   const [reusePhoto, setReusePhoto] = useState(!!seed?.photoTemplate);
   const [photo, setPhoto] = useState<File | null>(null);
   const [photoUrl, setPhotoUrl] = useState("");
+  const photoInput = useRef<HTMLInputElement>(null);
   const [dimensions, setDimensions] = useState({ width: 1000, height: 1000 });
   const [candidate, setCandidate] = useState<CaptionChoices | null>(null);
   const [selected, setSelected] = useState<number | null>(null);
@@ -42,6 +43,7 @@ export function MemeComposer({ userId, templates, seed, textEnabled = false }: {
     setForm(f => ({ ...f, [key]: value })); setError(null); setStatus(null);
   }
   function choosePhoto(file?: File) {
+    if (photoInput.current) photoInput.current.value = "";
     setError(null); setStatus(null); setReusePhoto(false); setPhoto(null); setPhotoUrl(""); setDimensions({ width: 1000, height: 1000 });
     if (!file) return;
     if (!["image/jpeg", "image/png", "image/webp"].includes(file.type) || !file.size || file.size > 3 * 1024 * 1024) { setError("captionPhotoInvalid"); return; }
@@ -102,7 +104,11 @@ export function MemeComposer({ userId, templates, seed, textEnabled = false }: {
             {template ? <div className="template-thumbnail"><Image src={template.imageUrl} width={template.width} height={template.height} unoptimized alt={template.name} /><a href={template.sourceUrl} target="_blank" rel="noreferrer">{t("templateSource")} ↗</a></div> : null}
           </> : <div className="photo-upload-panel">
             <label className="upload-label" htmlFor="caption-photo">{t("captionChoosePhoto")}</label>
-            <input id="caption-photo" type="file" accept="image/jpeg,image/png,image/webp" onChange={e => choosePhoto(e.target.files?.[0])} />
+            <input ref={photoInput} id="caption-photo" type="file" hidden accept="image/jpeg,image/png,image/webp" onChange={e => choosePhoto(e.target.files?.[0])} />
+            <div className="photo-file-picker">
+              <button type="button" className="secondary-button" onClick={() => photoInput.current?.click()}>{t("captionChooseFile")}</button>
+              <span className="photo-file-name" aria-live="polite">{photo?.name ?? t("noPhoto")}</span>
+            </div>
             <p className="field-hint">{t("captionPhotoHint")}</p>
             {reusePhoto && seed?.photoTemplate ? <div className="template-thumbnail"><MemeImage template={seed.photoTemplate} /><button className="secondary-button" type="button" onClick={() => choosePhoto()}>{t("captionRemovePhoto")}</button></div> : null}
             {photoUrl ? <div className="template-thumbnail"><Image src={photoUrl} width={dimensions.width} height={dimensions.height} unoptimized alt={t("captionYourPhoto")} onLoad={e => { const image = e.currentTarget; setDimensions({ width: image.naturalWidth, height: image.naturalHeight }); }} /><button className="secondary-button" type="button" onClick={() => choosePhoto()}>{t("captionRemovePhoto")}</button></div> : null}

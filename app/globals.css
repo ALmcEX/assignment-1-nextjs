@@ -57,6 +57,7 @@ input:focus,textarea:focus,select:focus{outline-color:var(--accent)}input::place
 
 .media-tabs { display:flex; gap:1rem; flex-wrap:wrap; margin-bottom:1.5rem; }
 .gallery-shell > .media-tabs { padding-top:24px; }
+.photo-file-picker{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.photo-file-name{min-width:0;overflow-wrap:anywhere;font-size:12px;color:var(--muted)}
 
 .image-prompt-block,.image-caption-block{border:1px solid var(--line);border-radius:6px;padding:20px;margin-bottom:20px}.image-prompt-block h2,.image-caption-block h2{font-size:15px;margin:0 0 20px;color:var(--ink)}.image-caption-block .field>small{display:block;font-size:10px;line-height:1.6;margin-top:10px;color:var(--muted)}
 /* Clear action hierarchy and caption selection */

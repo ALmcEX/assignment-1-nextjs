@@ -157,8 +157,15 @@ it("sends the chosen photo and shows four captions without using the image-gener
   vi.stubGlobal("fetch", fetcher);
   render(<MemeComposer userId="a" templates={templates} textEnabled />);
   fireEvent.click(screen.getByRole("button", { name: "Upload a photo" }));
+  expect(screen.getByText("No photo selected")).toBeTruthy();
+  const picker = screen.getByLabelText("Choose photo");
+  const openPicker = vi.spyOn(picker, "click");
+  fireEvent.click(screen.getByRole("button", { name: "Choose file" }));
+  expect(openPicker).toHaveBeenCalledOnce();
   const photo = new File(["test"], "cat.png", { type: "image/png" });
   fireEvent.change(screen.getByLabelText("Choose photo"), { target: { files: [photo] } });
+  expect(screen.getByText("cat.png")).toBeTruthy();
+  expect(screen.queryByText("No photo selected")).toBeNull();
   fireEvent.change(screen.getByLabelText(/Your scene/), { target: { value: "deadline" } });
   fireEvent.click(screen.getByRole("button", { name: "Generate caption" }));
   await screen.findByText("Nap first.");
